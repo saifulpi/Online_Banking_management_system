@@ -1,0 +1,19 @@
+# Git
+.git
+.gitignore
+
+# .NET build output
+bin
+obj
+*.user
+
+# IDE
+.vs
+.idea
+
+# Runtime uploads (contained on the container filesystem)
+uploads
+
+# Deployment / local config
+*.local.json
+appsettings.Development.json

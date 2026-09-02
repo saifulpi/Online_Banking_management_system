@@ -134,6 +134,14 @@ Money transfers update both the sender's and receiver's balances together. Where
    }
    ```
 
+   In a deployment environment you can override any of these values with environment variables using the `__` convention (these take precedence over `appsettings.json`):
+
+   ```bash
+   MongoDbSettings__ConnectionString=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/
+   MongoDbSettings__DatabaseName=onlinebank
+   Bankingsettings__MinimumTransactionAmount=100
+   ```
+
    Banking limits are configurable under `BankingSettings`:
    - `WithdrawLimit` — maximum single-withdrawal amount.
    - `TransferLimit` — maximum single-transfer amount.
@@ -162,6 +170,51 @@ An admin account is created automatically on startup. Use it to access the admin
 
 ---
 
+## Deployment (Railway)
+
+The repository ships with a production-ready `Dockerfile`, a `railway.json` deploy configuration, and a `.dockerignore`, so deploying to [Railway](https://railway.com) is straightforward.
+
+### 1. Prepare your MongoDB
+
+The app reads its connection settings from configuration at startup. For production, provide them via Railway environment variables (these override `appsettings.json`):
+
+| Variable                                  | Description                        |
+| ----------------------------------------- | ---------------------------------- |
+| `MongoDbSettings__ConnectionString`       | Your MongoDB Atlas connection string |
+| `MongoDbSettings__DatabaseName`           | Database name (default `onlinebank`) |
+| `BankingSettings__MinimumTransactionAmount` | Optional: override the minimum deposit/withdraw/transfer amount |
+
+> Use a dedicated production database/credentials rather than committed credentials.
+
+### 2. Push the code to a Git repository
+
+Railway builds directly from a Git remote (GitHub/GitLab/Bitbucket) or a public/private repository.
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+```
+
+### 3. Create a Railway project
+
+1. Go to [railway.com](https://railway.com) and sign in.
+2. Click **New Project** → **Deploy from GitHub repo** and select this repository.
+3. Railway automatically detects the `Dockerfile` and builds the image.
+4. Add the **`MongoDbSettings__ConnectionString`** (and any other optional vars) in **Variables** for the service.
+
+### 4. Verify
+
+Railway assigns a public URL (e.g. `https://your-app.up.railway.app`). The admin account is seeded automatically on first startup; you can then log in, change the default admin password, and start using the app.
+
+### Notes & limitations
+
+- **Ports:** The `railway.json`/`Dockerfile` bind the app to `0.0.0.0:$PORT` (Railway sets `PORT` automatically). No manual port configuration is needed.
+- **HTTPS:** `UseForwardedHeaders` is configured so that HTTPS redirection and HSTS work correctly behind Railway's TLS-terminating proxy without redirect loops.
+- **Profile pictures:** Uploaded profile pictures are stored on the container's local filesystem. Because Railway containers are ephemeral, these files are **not persisted** across redeploys. For durable storage you would integrate an object-storage service (e.g. AWS S3); this is outside the current scope.
+
+---
+
 ## Project Structure
 
 ```
@@ -175,6 +228,9 @@ OnlineBankingSystem/
 ├── wwwroot/              # Static assets (CSS, JS, libs)
 ├── appsettings.json      # Configuration (DB connection, banking limits)
 ├── Program.cs            # Application entry point and service configuration
+├── Dockerfile            # Production build/run image (used by Railway)
+├── railway.json          # Railway deploy configuration
+├── .dockerignore         # Excludes build artifacts from the Docker image
 └── OnlineBankingSystem.csproj
 ```
 

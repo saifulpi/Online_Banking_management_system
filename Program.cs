@@ -1,5 +1,6 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using OnlineBankingSystem.Data;
 
 // Use Bangladeshi Taka (BDT) as the default currency throughout the application so
@@ -30,6 +31,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+// Correctly resolve the original scheme/host when running behind a TLS-terminating
+// reverse proxy (e.g. Railway). This keeps HSTS/HTTPS redirection working without
+// redirect loops. Railway's proxy addresses are dynamic, so we trust forwarded headers.
+if (string.Equals(System.Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase) == false)
+{
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        KnownIPNetworks = { },
+        KnownProxies = { }
+    });
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

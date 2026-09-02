@@ -1,0 +1,19 @@
+# .NET build output
+bin/
+obj/
+*.user
+
+# Visual Studio
+.vs/
+.idea/
+
+# Local configuration / secrets
+appsettings.Development.json
+*.local.json
+appsettings.*.local.json
+
+# Runtime profile-picture uploads (kept out of version control)
+uploads/
+
+# Deployment artifacts
+publish/
