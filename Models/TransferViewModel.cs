@@ -10,7 +10,7 @@ public class TransferViewModel
     [Required(ErrorMessage = "Receiver account number is required.")]
     public string ToAccountNumber { get; set; } = string.Empty;
 
-    [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+    [Range(100, double.MaxValue, ErrorMessage = "Amount must be at least 100.")]
     public decimal Amount { get; set; }
 
     [StringLength(200, ErrorMessage = "Reference cannot exceed 200 characters.")]

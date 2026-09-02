@@ -33,6 +33,7 @@ public class AccountService : IAccountService
 {
     private readonly MongoDbContext _context;
     private readonly IMongoClient _client;
+    private readonly decimal _minimumTransactionAmount;
     private readonly decimal _withdrawLimit;
     private readonly decimal _transferLimit;
     private readonly decimal _dailyWithdrawLimit;
@@ -43,6 +44,7 @@ public class AccountService : IAccountService
     {
         _context = context;
         _client = context.Client;
+        _minimumTransactionAmount = configuration.GetValue<decimal>("BankingSettings:MinimumTransactionAmount");
         _withdrawLimit = configuration.GetValue<decimal>("BankingSettings:WithdrawLimit");
         _transferLimit = configuration.GetValue<decimal>("BankingSettings:TransferLimit");
         _dailyWithdrawLimit = configuration.GetValue<decimal>("BankingSettings:DailyWithdrawLimit");
@@ -118,6 +120,8 @@ public class AccountService : IAccountService
         if (!string.Equals(account.Status, "Active", StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Deposit failed. The account is frozen or inactive.");
 
+        EnsureMeetsMinimumAmount(amount, "Deposit");
+
         account.Balance += amount;
 
         var filter = Builders<Account>.Filter.Eq(a => a.Id, account.Id);
@@ -144,6 +148,8 @@ public class AccountService : IAccountService
         if (amount > _withdrawLimit)
             throw new InvalidOperationException(
                 $"Withdrawal failed. Amount exceeds the per-transaction limit of {_withdrawLimit:C}.");
+
+        EnsureMeetsMinimumAmount(amount, "Withdrawal");
 
         await EnsureWithinDailyWithdrawalLimitAsync(accountNumber, amount);
         await EnsureWithinDailyWithdrawalCountLimitAsync(accountNumber);
@@ -173,6 +179,8 @@ public class AccountService : IAccountService
         if (amount > _transferLimit)
             throw new InvalidOperationException(
                 $"Transfer failed. Amount exceeds the per-transaction limit of {_transferLimit:C}.");
+
+        EnsureMeetsMinimumAmount(amount, "Transfer");
 
         var sender = await GetAccountAsync(fromAccountNumber);
         if (sender == null)
@@ -435,6 +443,13 @@ public class AccountService : IAccountService
         await _context.Accounts.UpdateOneAsync(filter, update);
 
         return account;
+    }
+
+    private void EnsureMeetsMinimumAmount(decimal amount, string action)
+    {
+        if (_minimumTransactionAmount > 0 && amount < _minimumTransactionAmount)
+            throw new InvalidOperationException(
+                $"{action} failed. The minimum amount is {_minimumTransactionAmount:C}.");
     }
 
     private async Task EnsureWithinDailyWithdrawalLimitAsync(string accountNumber, decimal amount)

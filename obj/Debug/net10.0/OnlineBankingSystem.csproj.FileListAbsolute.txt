@@ -148,3 +148,13 @@ C:\Users\saifu\AppData\Local\Temp\obs_build_taka\OnlineBankingSystem.deps.json
 C:\Users\saifu\AppData\Local\Temp\obs_build_taka\OnlineBankingSystem.runtimeconfig.json
 C:\Users\saifu\AppData\Local\Temp\obs_build_taka\OnlineBankingSystem.dll
 C:\Users\saifu\AppData\Local\Temp\obs_build_taka\OnlineBankingSystem.pdb
+D:\Projects\Online_Banking_System\obj\Debug\net10.0\OnlineBankingSystem.sourcelink.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\appsettings.Development.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\appsettings.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\OnlineBankingSystem.staticwebassets.runtime.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\OnlineBankingSystem.staticwebassets.endpoints.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\OnlineBankingSystem.exe
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\OnlineBankingSystem.deps.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\OnlineBankingSystem.runtimeconfig.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\OnlineBankingSystem.dll
+C:\Users\saifu\AppData\Local\Temp\obs_build_min\OnlineBankingSystem.pdb
