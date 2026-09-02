@@ -1,0 +1,275 @@
+@model TransferViewModel
+@{
+    ViewData["Title"] = "Money Transfer";
+    var accounts = ViewBag.Accounts as List<Account> ?? new List<Account>();
+    var isAdmin = User.IsInRole("Admin");
+    var currentBalance = (decimal?)ViewBag.CurrentBalance;
+    if (!isAdmin) { Layout = "_DashboardLayout"; }
+
+    string AmountFormatted(decimal? value) => value?.ToString("C") ?? "-";
+}
+
+<div class="mx-auto w-full max-w-xl">
+    <!-- Page header -->
+    <header class="mb-6">
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Money Transfer</h1>
+        <p class="mt-1 text-sm text-slate-600">Transfer money from your account to another account.</p>
+        <p class="mt-2 text-xs text-slate-500">Note: A per-transaction transfer limit applies, with a maximum of 5 transfers per day. The sender must have sufficient balance.</p>
+    </header>
+
+    <!-- Form card -->
+    <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <!-- Balance banner -->
+        <div class="border-b border-slate-200 bg-slate-50 px-6 py-5 sm:px-8">
+            <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Current Balance</p>
+            <p class="mt-1 text-3xl font-bold text-slate-900">@AmountFormatted(currentBalance)</p>
+        </div>
+
+        <form id="transferForm" asp-action="Transfer" method="post" class="p-6 sm:p-8" novalidate>
+            @Html.AntiForgeryToken()
+
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="mb-6 flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
+                    <svg class="mt-0.5 h-5 w-5 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+                    </svg>
+                    <div asp-validation-summary="All" class="text-sm text-red-700"></div>
+                </div>
+            }
+
+            <div class="space-y-6">
+                <!-- Sender account -->
+                <div>
+                    <label asp-for="FromAccountNumber" class="block text-sm font-medium text-slate-700">Sender Account Number</label>
+                    <div class="mt-1.5">
+                        @if (isAdmin)
+                        {
+                            <input asp-for="FromAccountNumber" list="accounts-list" autocomplete="off"
+                                   class="block w-full rounded-md border-slate-300 px-3 py-2.5 text-base text-slate-900 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 sm:text-sm" />
+                        }
+                        else
+                        {
+                            <input asp-for="FromAccountNumber" readonly
+                                   class="block w-full rounded-md border-slate-200 bg-slate-50 px-3 py-2.5 text-base font-medium text-slate-700 sm:text-sm" />
+                            <p class="mt-1.5 text-xs text-slate-500">Transfers are sent from your own account.</p>
+                        }
+                    </div>
+                    <span asp-validation-for="FromAccountNumber" class="text-xs text-red-600"></span>
+                </div>
+
+                <!-- Receiver account -->
+                <div>
+                    <label asp-for="ToAccountNumber" class="block text-sm font-medium text-slate-700">Receiver Account Number</label>
+                    <div class="mt-1.5">
+                        @if (isAdmin)
+                        {
+                            <input asp-for="ToAccountNumber" list="accounts-list" autocomplete="off"
+                                   class="block w-full rounded-md border-slate-300 px-3 py-2.5 text-base text-slate-900 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 sm:text-sm" />
+                            <datalist id="accounts-list">
+                                @foreach (var account in accounts)
+                                {
+                                    <option value="@account.AccountNumber">@account.Name</option>
+                                }
+                            </datalist>
+                        }
+                        else
+                        {
+                            <input asp-for="ToAccountNumber" list="accounts-list" autocomplete="off"
+                                   class="block w-full rounded-md border-slate-300 px-3 py-2.5 text-base text-slate-900 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 sm:text-sm" />
+                            <datalist id="accounts-list">
+                                @foreach (var account in accounts)
+                                {
+                                    <option value="@account.AccountNumber">@account.Name</option>
+                                }
+                            </datalist>
+                            <p class="mt-1.5 text-xs text-slate-500">Enter the account number you want to send money to.</p>
+                        }
+                    </div>
+                    <span asp-validation-for="ToAccountNumber" class="text-xs text-red-600"></span>
+                </div>
+
+                <!-- Amount -->
+                <div>
+                    <label asp-for="Amount" class="block text-sm font-medium text-slate-700">Amount</label>
+                    <div class="relative mt-1.5">
+                        <input asp-for="Amount" type="number" step="0.01" min="0.01" placeholder="0.00" id="Amount"
+                               class="block w-full rounded-md border-slate-300 px-3 pl-8 py-2.5 text-base text-slate-900 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 sm:text-sm" />
+                        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">৳</span>
+                    </div>
+                    <p class="mt-1.5 text-xs text-slate-500">Enter the amount you want to transfer.</p>
+                    <span asp-validation-for="Amount" class="text-xs text-red-600"></span>
+                </div>
+
+                <!-- Reference / Description -->
+                <div>
+                    <label asp-for="Reference" class="block text-sm font-medium text-slate-700">Reference (Optional)</label>
+                    <input asp-for="Reference" type="text" maxlength="200" placeholder="e.g. Rent payment, invoice #123"
+                           class="mt-1.5 block w-full rounded-md border-slate-300 px-3 py-2.5 text-base text-slate-900 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 sm:text-sm" />
+                    <p class="mt-1.5 text-xs text-slate-500">Add a short description for your record.</p>
+                    <span asp-validation-for="Reference" class="text-xs text-red-600"></span>
+                </div>
+
+                <!-- Live transfer summary -->
+                <div class="rounded-md border border-indigo-100 bg-indigo-50 p-4">
+                    <p class="text-xs font-medium uppercase tracking-wider text-indigo-600">Transfer Summary</p>
+                    <dl class="mt-2 space-y-1.5 text-sm">
+                        <div class="flex items-center justify-between">
+                            <dt class="text-slate-500">Amount</dt>
+                            <dd id="summaryAmount" class="font-semibold text-slate-900">৳0.00</dd>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <dt class="text-slate-500">From</dt>
+                            <dd id="summaryFrom" class="font-semibold text-slate-900">—</dd>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <dt class="text-slate-500">To</dt>
+                            <dd id="summaryTo" class="font-semibold text-slate-900">—</dd>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-indigo-200 pt-1.5">
+                            <dt class="text-slate-500">Balance After</dt>
+                            <dd id="summaryBalance" class="font-semibold text-slate-900">—</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col-reverse items-stretch gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                    <a asp-controller="Home" asp-action="Index"
+                       class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        Cancel
+                    </a>
+                    <button type="submit" id="transferSubmitBtn"
+                            class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">
+                        Transfer Money
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Information card -->
+    <div class="mt-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex items-center gap-2">
+            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h2 class="text-sm font-semibold text-slate-900">Transfer Information</h2>
+        </div>
+        <ul class="mt-3 space-y-2 text-sm text-slate-600">
+            <li class="flex items-start gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500"></span>
+                The amount is deducted from your account immediately.
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500"></span>
+                Make sure the receiver account number is correct.
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500"></span>
+                Make sure you have sufficient balance.
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Confirmation modal -->
+<div id="transferModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/50" onclick="closeTransferModal()"></div>
+    <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <div class="flex items-start gap-4">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-indigo-100">
+                <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                </svg>
+            </div>
+            <div class="min-w-0">
+                <h2 class="text-base font-semibold text-slate-900">Confirm Transfer</h2>
+                <p class="mt-1 text-sm text-slate-600">
+                    Transfer <span id="modalAmount" class="font-semibold text-slate-900">৳0.00</span>
+                    from account <span id="modalFrom" class="font-semibold text-slate-900">—</span>
+                    to account <span id="modalTo" class="font-semibold text-slate-900">—</span>?
+                </p>
+                <p class="mt-2 text-sm font-medium text-indigo-600">This will be deducted from your account immediately.</p>
+
+                @if (!isAdmin)
+                {
+                    <div class="mt-4">
+                        <label asp-for="Password" class="block text-sm font-medium text-slate-700">Enter Your Password</label>
+                        <input asp-for="Password" type="password" form="transferForm" autocomplete="current-password" placeholder="••••••••"
+                               class="mt-1.5 block w-full rounded-md border-slate-300 px-3 py-2.5 text-base text-slate-900 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 sm:text-sm" />
+                        <p class="mt-1.5 text-xs text-slate-500">Enter your account password to authorize this transfer.</p>
+                        <span asp-validation-for="Password" class="text-xs text-red-600"></span>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="mt-6 flex items-center justify-end gap-3">
+            <button type="button" onclick="closeTransferModal()"
+                    class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                Cancel
+            </button>
+            <button type="button" id="confirmTransferBtn"
+                    class="rounded-md bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">
+                Yes, Transfer
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const transferForm = document.getElementById('transferForm');
+        const balanceAfter = document.getElementById('summaryBalance');
+        const transferBalanceRaw = '@Html.Raw(currentBalance.HasValue ? currentBalance.Value.ToString("0.00") : "0.00")';
+
+        function updateTransferSummary() {
+            const raw = transferForm.querySelector('[name="Amount"]').value;
+            const amount = (raw === '' || isNaN(raw)) ? 0 : Number(raw);
+            const fromAccount = transferForm.querySelector('[name="FromAccountNumber"]').value;
+            const toAccount = transferForm.querySelector('[name="ToAccountNumber"]').value;
+
+            const fmt = function (v) {
+                return '৳ ' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            document.getElementById('summaryAmount').textContent = fmt(amount);
+            document.getElementById('summaryFrom').textContent = fromAccount || '—';
+            document.getElementById('summaryTo').textContent = toAccount || '—';
+
+            const after = Number(transferBalanceRaw) - amount;
+            balanceAfter.textContent = fmt(after);
+            balanceAfter.classList.toggle('text-red-600', after < 0);
+        }
+
+        transferForm.querySelector('[name="Amount"]').addEventListener('input', updateTransferSummary);
+        transferForm.querySelector('[name="ToAccountNumber"]').addEventListener('input', updateTransferSummary);
+
+        transferForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            if (!transferForm.checkValidity()) {
+                transferForm.reportValidity();
+                return;
+            }
+
+            const raw = transferForm.querySelector('[name="Amount"]').value;
+            const amount = (raw === '' || isNaN(raw)) ? '৳0.00' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'BDT' }).format(Number(raw));
+            const fromAccount = transferForm.querySelector('[name="FromAccountNumber"]').value;
+            const toAccount = transferForm.querySelector('[name="ToAccountNumber"]').value;
+            document.getElementById('modalAmount').textContent = amount;
+            document.getElementById('modalFrom').textContent = fromAccount;
+            document.getElementById('modalTo').textContent = toAccount;
+            document.getElementById('transferModal').classList.remove('hidden');
+        });
+
+        document.getElementById('confirmTransferBtn').addEventListener('click', function () {
+            transferForm.submit();
+        });
+
+        function closeTransferModal() {
+            document.getElementById('transferModal').classList.add('hidden');
+        }
+    </script>
+}

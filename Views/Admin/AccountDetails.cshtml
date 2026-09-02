@@ -1,0 +1,129 @@
+@model Account
+@{
+    ViewData["Title"] = "Account Details";
+    var holder = (AppUser?)ViewBag.Holder;
+    var transactions = (List<Transaction>)ViewBag.Transactions;
+    var totalTransactions = (int)ViewBag.TotalTransactions;
+
+    string StatusBadge(string status)
+    {
+        return string.Equals(status, "Active", StringComparison.OrdinalIgnoreCase)
+            ? "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800"
+            : "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800";
+    }
+}
+
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">Account Details</h1>
+        <p class="mt-1 text-sm text-slate-600">Account @Model.AccountNumber</p>
+    </div>
+    <a asp-controller="Admin" asp-action="Accounts" class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+        ← Back to Accounts
+    </a>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <!-- Account info -->
+    <div class="rounded-lg bg-white p-6 shadow">
+        <h2 class="text-lg font-semibold text-slate-900">Account Information</h2>
+        <dl class="mt-4 space-y-3 text-sm">
+            <div class="flex justify-between"><dt class="text-slate-500">Account Number</dt><dd class="font-medium text-slate-900">@Model.AccountNumber</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Account Type</dt><dd class="font-medium text-slate-900">@Model.AccountType</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Account Holder</dt><dd class="font-medium text-slate-900">@(holder?.FullName ?? Model.Name)</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Balance</dt><dd class="text-lg font-bold text-slate-900">@Model.Balance.ToString("C")</dd></div>
+            <div class="flex justify-between">
+                <dt class="text-slate-500">Status</dt>
+                <dd><span class="@(StatusBadge(Model.Status))">@Model.Status</span></dd>
+            </div>
+            <div class="flex justify-between"><dt class="text-slate-500">Created</dt><dd class="font-medium text-slate-900">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd></div>
+        </dl>
+    </div>
+
+    <!-- Holder info -->
+    <div class="rounded-lg bg-white p-6 shadow">
+        <h2 class="text-lg font-semibold text-slate-900">Holder Information</h2>
+        @if (holder != null)
+        {
+            <dl class="mt-4 space-y-3 text-sm">
+                <div class="flex justify-between"><dt class="text-slate-500">User ID</dt><dd class="font-medium text-slate-900">@holder.Id.Substring(holder.Id.Length - 8)</dd></div>
+                <div class="flex justify-between"><dt class="text-slate-500">Name</dt><dd class="font-medium text-slate-900">@holder.FullName</dd></div>
+                <div class="flex justify-between"><dt class="text-slate-500">Email</dt><dd class="font-medium text-slate-900">@holder.Email</dd></div>
+                <div class="flex justify-between"><dt class="text-slate-500">Phone</dt><dd class="font-medium text-slate-900">@holder.MobileNumber</dd></div>
+            </dl>
+            <a asp-controller="Admin" asp-action="UserDetails" asp-route-id="@holder.Id"
+               class="mt-4 inline-block rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">View User</a>
+        }
+        else
+        {
+            <p class="mt-4 text-sm text-slate-500">No registered user is linked to this account.</p>
+        }
+    </div>
+
+    <!-- Actions -->
+    <div class="rounded-lg bg-white p-6 shadow">
+        <h2 class="text-lg font-semibold text-slate-900">Account Actions</h2>
+        <div class="mt-4 space-y-3">
+            <a asp-controller="Account" asp-action="Deposit"
+               class="block rounded-md bg-emerald-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-emerald-700">Make a Deposit</a>
+            <a asp-controller="Account" asp-action="Withdraw"
+               class="block rounded-md bg-amber-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-amber-700">Process a Withdrawal</a>
+            @if (Model.Status == "Active")
+            {
+                <form asp-controller="Admin" asp-action="FreezeAccount" asp-route-accountNumber="@Model.AccountNumber" method="post"
+                      class="user-action-form" data-action="freeze" data-user-name="@Model.AccountNumber">
+                    <button type="submit" class="w-full rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Freeze Account</button>
+                </form>
+            }
+            else
+            {
+                <form asp-controller="Admin" asp-action="ActivateAccount" asp-route-accountNumber="@Model.AccountNumber" method="post"
+                      class="user-action-form" data-action="activate-account" data-user-name="@Model.AccountNumber">
+                    <button type="submit" class="w-full rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">Activate Account</button>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Transactions -->
+<div class="mt-6 rounded-lg bg-white p-6 shadow">
+    <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Recent Transactions</h2>
+        <a asp-controller="Admin" asp-action="Transactions" asp-route-accountNumber="@Model.AccountNumber"
+           class="text-sm font-medium text-slate-600 hover:text-slate-900">View all (@totalTransactions)</a>
+    </div>
+    <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Type</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Balance After</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Note</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Date &amp; Time</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white">
+                @if (transactions.Count == 0)
+                {
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">No transactions found.</td></tr>
+                }
+                @foreach (var t in transactions)
+                {
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3"><partial name="_TransactionBadges" model="t" /></td>
+                        <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">@t.Amount.ToString("C")</td>
+                        <td class="px-4 py-3 text-right text-sm text-slate-600">@t.BalanceAfter.ToString("C")</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Note</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(t.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@t.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<partial name="_ConfirmUserActionModal" />

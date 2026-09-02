@@ -1,0 +1,79 @@
+@model List<Transaction>
+@{
+    var nameMap = (Dictionary<string, string>)ViewBag.NameMap;
+
+    decimal PreviousBalance(Transaction t)
+    {
+        var isCredit = t.Type == TransactionType.Deposit
+            || (t.Type == TransactionType.Transfer
+                && t.Note.StartsWith("Received", StringComparison.OrdinalIgnoreCase));
+        return isCredit ? t.BalanceAfter - t.Amount : t.BalanceAfter + t.Amount;
+    }
+
+    string ColumnClass(bool right = false)
+    {
+        return right
+            ? "px-4 py-3 text-right text-sm font-semibold text-slate-900"
+            : "px-4 py-3 text-sm text-slate-600";
+    }
+}
+
+<div class="mt-4 overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Transaction ID</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Account</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">User</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Type</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                @if (ViewBag.ShowBalances == true)
+                {
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Previous Balance</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">New Balance</th>
+                }
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Date &amp; Time</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Reference</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 bg-white">
+            @if (Model.Count == 0)
+            {
+                <tr>
+                    <td colspan="10" class="px-4 py-8 text-center text-sm text-slate-500">No transactions found.</td>
+                </tr>
+            }
+            @foreach (var t in Model)
+            {
+                var otherAccount = t.RelatedAccountNumber;
+                <tr class="hover:bg-slate-50">
+                    <td class="px-4 py-3 text-sm text-slate-600">@t.Id.Substring(t.Id.Length - 8)</td>
+                    <td class="px-4 py-3 text-sm font-medium text-slate-900">
+                        @t.AccountNumber
+                        @if (!string.IsNullOrEmpty(otherAccount))
+                        {
+                            <span class="text-xs text-slate-400">→ @otherAccount</span>
+                        }
+                    </td>
+                    <td class="px-4 py-3 text-sm text-slate-600">@(nameMap.ContainsKey(t.AccountNumber) ? nameMap[t.AccountNumber] : "—")</td>
+                    <td class="px-4 py-3"><partial name="_TransactionBadges" model="t" /></td>
+                    <td class="@(ColumnClass(true))">@t.Amount.ToString("C")</td>
+                    @if (ViewBag.ShowBalances == true)
+                    {
+                        <td class="@(ColumnClass(true))">@PreviousBalance(t).ToString("C")</td>
+                        <td class="@(ColumnClass(true))">@t.BalanceAfter.ToString("C")</td>
+                    }
+                    <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(t.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@t.Status</span></td>
+                    <td class="px-4 py-3 text-sm text-slate-600">@t.Note</td>
+                    <td class="px-4 py-3">
+                        <a asp-controller="Admin" asp-action="TransactionDetails" asp-route-id="@t.Id"
+                           class="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

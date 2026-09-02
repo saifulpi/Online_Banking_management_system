@@ -1,0 +1,127 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var nameMap = (Dictionary<string, string>)ViewBag.NameMap;
+}
+
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-900">Admin Dashboard</h1>
+    <p class="mt-1 text-sm text-slate-600">Overview of the entire banking system.</p>
+</div>
+
+<!-- Statistics cards -->
+<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="rounded-lg bg-white p-6 shadow">
+        <p class="text-sm font-medium text-slate-500">Total Users</p>
+        <p class="mt-2 text-3xl font-bold text-slate-900">@Model.TotalUsers</p>
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
+        <p class="text-sm font-medium text-slate-500">Total Accounts</p>
+        <p class="mt-2 text-3xl font-bold text-slate-900">@Model.TotalAccounts</p>
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
+        <p class="text-sm font-medium text-slate-500">Total Deposits</p>
+        <p class="mt-2 text-3xl font-bold text-emerald-600">@Model.TotalDeposits.ToString("C")</p>
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
+        <p class="text-sm font-medium text-slate-500">Total Withdrawals</p>
+        <p class="mt-2 text-3xl font-bold text-red-600">@Model.TotalWithdrawals.ToString("C")</p>
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
+        <p class="text-sm font-medium text-slate-500">Total Transferred Funds</p>
+        <p class="mt-2 text-3xl font-bold text-indigo-600">@Model.TotalTransferredFunds.ToString("C")</p>
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
+        <p class="text-sm font-medium text-slate-500">Total System Balance</p>
+        <p class="mt-2 text-3xl font-bold text-slate-900">@Model.TotalSystemBalance.ToString("C")</p>
+    </div>
+</div>
+
+<!-- Recent transactions -->
+<div class="mt-8 rounded-lg bg-white p-6 shadow">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h2 class="text-lg font-semibold text-slate-900">Recent Transactions</h2>
+            <p class="text-sm text-slate-500">Latest transactions across the entire system.</p>
+        </div>
+        <a asp-controller="Admin" asp-action="Transactions"
+           class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+            View All
+        </a>
+    </div>
+
+    <form method="get" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div>
+            <label class="block text-xs font-medium text-slate-600">Transaction Type</label>
+            <select name="type" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm">
+                <option value="">All Types</option>
+                <option value="Deposit" selected="@(Model.TypeFilter == "Deposit")">Deposit</option>
+                <option value="Withdrawal" selected="@(Model.TypeFilter == "Withdrawal")">Withdrawal</option>
+                <option value="Transfer" selected="@(Model.TypeFilter == "Transfer")">Fund Transfer</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600">Status</label>
+            <select name="status" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm">
+                <option value="">All Statuses</option>
+                <option value="Completed" selected="@(Model.StatusFilter == "Completed")">Completed</option>
+                <option value="Pending" selected="@(Model.StatusFilter == "Pending")">Pending</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600">From Date</label>
+            <input type="date" name="from" value="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                   class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm" />
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600">To Date</label>
+            <input type="date" name="to" value="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                   class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm" />
+        </div>
+        <div class="flex items-end">
+            <button type="submit"
+                    class="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                Filter
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Transaction ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">User / Account</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Type</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Date &amp; Time</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white">
+                @if (Model.RecentTransactions.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500">No transactions found.</td>
+                    </tr>
+                }
+                @foreach (var t in Model.RecentTransactions)
+                {
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Id.Substring(t.Id.Length - 8)</td>
+                        <td class="px-4 py-3 text-sm text-slate-900">
+                            @(nameMap.ContainsKey(t.AccountNumber) ? nameMap[t.AccountNumber] : t.AccountNumber)
+                            <span class="text-xs text-slate-400">(@t.AccountNumber)</span>
+                        </td>
+                        <td class="px-4 py-3"><partial name="_TransactionBadges" model="t" /></td>
+                        <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">@t.Amount.ToString("C")</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(t.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@t.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_Pagination" />
+</div>

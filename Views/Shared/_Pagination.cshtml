@@ -1,0 +1,45 @@
+@{
+    var currentPage = (int)(ViewBag.Page ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+
+    string BuildUrl(int page)
+    {
+        var query = Context.Request.Query;
+        var parameters = new List<string>();
+        foreach (var key in query.Keys)
+        {
+            if (string.Equals(key, "page", StringComparison.OrdinalIgnoreCase))
+                continue;
+            var value = query[key].ToString();
+            if (!string.IsNullOrWhiteSpace(value))
+                parameters.Add($"{key}={Uri.EscapeDataString(value)}");
+        }
+        parameters.Add($"page={page}");
+        return Url.Action() + "?" + string.Join("&", parameters);
+    }
+}
+
+@if (totalPages > 1)
+{
+    <nav class="mt-6 flex items-center justify-between border-t border-slate-200 pt-4">
+        <p class="text-sm text-slate-500">
+            Page @currentPage of @totalPages
+        </p>
+        <div class="flex items-center space-x-1">
+            @if (currentPage > 1)
+            {
+                <a href="@BuildUrl(currentPage - 1)"
+                   class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Previous
+                </a>
+            }
+            @if (currentPage < totalPages)
+            {
+                <a href="@BuildUrl(currentPage + 1)"
+                   class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Next
+                </a>
+            }
+        </div>
+    </nav>
+}

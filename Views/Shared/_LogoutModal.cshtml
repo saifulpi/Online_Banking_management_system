@@ -1,0 +1,53 @@
+<div id="logoutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-slate-900/50" onclick="closeLogoutModal()"></div>
+    <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <div class="flex items-start space-x-4">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-lg font-semibold text-slate-900">Confirm Logout</h2>
+                <p class="mt-1 text-sm text-slate-600">Are you sure you want to log out?</p>
+                <p class="mt-2 text-sm font-medium text-emerald-700">You will be returned to the login page.</p>
+            </div>
+        </div>
+        <div class="mt-6 flex items-center justify-end space-x-3">
+            <button type="button" onclick="closeLogoutModal()"
+                    class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+                Cancel
+            </button>
+            <button type="button" id="confirmLogoutBtn"
+                    class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+                Yes, Log Out
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pendingLogoutForm = null;
+
+    document.querySelectorAll('.logout-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            pendingLogoutForm = form;
+            document.getElementById('logoutModal').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('confirmLogoutBtn').addEventListener('click', function () {
+        if (pendingLogoutForm) {
+            const form = pendingLogoutForm;
+            pendingLogoutForm = null;
+            form.submit();
+        }
+        closeLogoutModal();
+    });
+
+    function closeLogoutModal() {
+        pendingLogoutForm = null;
+        document.getElementById('logoutModal').classList.add('hidden');
+    }
+</script>

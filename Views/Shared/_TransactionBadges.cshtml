@@ -1,0 +1,37 @@
+@model Transaction
+
+@{
+    string TypeBadge(TransactionType type)
+    {
+        return type switch
+        {
+            TransactionType.Deposit => "bg-emerald-100 text-emerald-800",
+            TransactionType.Withdrawal => "bg-red-100 text-red-800",
+            TransactionType.Transfer => "bg-indigo-100 text-indigo-800",
+            _ => "bg-slate-100 text-slate-700"
+        };
+    }
+
+    string StatusBadge(string status)
+    {
+        return string.Equals(status, "Completed", StringComparison.OrdinalIgnoreCase)
+            ? "bg-emerald-100 text-emerald-800"
+            : "bg-amber-100 text-amber-800";
+    }
+
+    var isOutgoingTransfer = Model.Type == TransactionType.Transfer
+        && Model.Note.StartsWith("Transferred", StringComparison.OrdinalIgnoreCase);
+    var displayType = Model.Type == TransactionType.Transfer
+        ? (isOutgoingTransfer ? "Transfer Sent" : "Transfer Received")
+        : Model.Type.ToString();
+    var direction = Model.Type == TransactionType.Transfer
+        ? (isOutgoingTransfer ? "↗" : "↙")
+        : (Model.Type == TransactionType.Deposit ? "↓" : "↑");
+}
+
+<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(TypeBadge(Model.Type))">
+    @direction @displayType
+</span>
+<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(StatusBadge(Model.Status))">
+    @Model.Status
+</span>

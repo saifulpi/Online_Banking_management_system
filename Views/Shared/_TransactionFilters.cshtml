@@ -1,0 +1,52 @@
+@{
+    var sectionTitle = (string)ViewBag.SectionTitle;
+    var showType = string.Equals(sectionTitle, "Transaction Management", StringComparison.OrdinalIgnoreCase);
+}
+
+<form method="get" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+    @if (showType)
+    {
+        <div>
+            <label class="block text-xs font-medium text-slate-600">Transaction Type</label>
+            <select name="type" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm">
+                <option value="">All Types</option>
+                <option value="Deposit" selected="@(ViewBag.Type == "Deposit")">Deposit</option>
+                <option value="Withdrawal" selected="@(ViewBag.Type == "Withdrawal")">Withdrawal</option>
+                <option value="Transfer" selected="@(ViewBag.Type == "Transfer")">Fund Transfer</option>
+            </select>
+        </div>
+    }
+    <div>
+        <label class="block text-xs font-medium text-slate-600">Status</label>
+        <select name="status" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm">
+            <option value="">All Statuses</option>
+            <option value="Completed" selected="@(ViewBag.Status == "Completed")">Completed</option>
+            <option value="Pending" selected="@(ViewBag.Status == "Pending")">Pending</option>
+        </select>
+    </div>
+    <div>
+        <label class="block text-xs font-medium text-slate-600">Account Number</label>
+        <input type="text" name="accountNumber" value="@ViewBag.AccountNumber" placeholder="e.g. 12345678"
+               class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm" />
+    </div>
+    <div>
+        <label class="block text-xs font-medium text-slate-600">Search</label>
+        <input type="text" name="search" value="@ViewBag.Search" placeholder="Note, related account..."
+               class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm" />
+    </div>
+    <div>
+        <label class="block text-xs font-medium text-slate-600">From Date</label>
+        <input type="date" name="from" value="@ViewBag.From"
+               class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm" />
+    </div>
+    <div>
+        <label class="block text-xs font-medium text-slate-600">To Date</label>
+        <input type="date" name="to" value="@ViewBag.To"
+               class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm" />
+    </div>
+    <div class="sm:col-span-2 lg:col-span-6">
+        <button type="submit" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+            Filter
+        </button>
+    </div>
+</form>

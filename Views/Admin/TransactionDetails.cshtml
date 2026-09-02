@@ -1,0 +1,92 @@
+@model Transaction
+@{
+    ViewData["Title"] = "Transaction Details";
+    var nameMap = (Dictionary<string, string>)ViewBag.NameMap;
+
+    var isOutgoing = Model.Type == TransactionType.Transfer
+        && Model.Note.StartsWith("Transferred", StringComparison.OrdinalIgnoreCase);
+    var direction = Model.Type == TransactionType.Transfer ? (isOutgoing ? "Sent" : "Received") : "";
+    var displayType = Model.Type == TransactionType.Transfer
+        ? $"Fund Transfer {direction}".Trim()
+        : Model.Type.ToString();
+
+    decimal PreviousBalance(Transaction t)
+    {
+        var isCredit = t.Type == TransactionType.Deposit
+            || (t.Type == TransactionType.Transfer
+                && t.Note.StartsWith("Received", StringComparison.OrdinalIgnoreCase));
+        return isCredit ? t.BalanceAfter - t.Amount : t.BalanceAfter + t.Amount;
+    }
+}
+
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">Transaction Details</h1>
+        <p class="mt-1 text-sm text-slate-600">Transaction @Model.Id.Substring(Model.Id.Length - 8)</p>
+    </div>
+    <div class="flex items-center space-x-3">
+        <a asp-controller="Admin" asp-action="Transactions"
+           class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">All Transactions</a>
+        <a asp-controller="Admin" asp-action="AccountDetails" asp-route-accountNumber="@Model.AccountNumber"
+           class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">View Account</a>
+    </div>
+</div>
+
+<div class="rounded-lg bg-white p-6 shadow">
+    <dl class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div>
+            <dt class="text-sm text-slate-500">Transaction ID</dt>
+            <dd class="mt-1 text-sm font-medium text-slate-900">@Model.Id</dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">Account</dt>
+            <dd class="mt-1 text-sm font-medium text-slate-900">@Model.AccountNumber</dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">User</dt>
+            <dd class="mt-1 text-sm font-medium text-slate-900">@(nameMap.ContainsKey(Model.AccountNumber) ? nameMap[Model.AccountNumber] : "—")</dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">Transaction Type</dt>
+            <dd class="mt-1 text-sm font-medium text-slate-900">@displayType</dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">Amount</dt>
+            <dd class="mt-1 text-sm font-bold text-slate-900">@Model.Amount.ToString("C")</dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">Status</dt>
+            <dd class="mt-1"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(Model.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@Model.Status</span></dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">Previous Balance</dt>
+            <dd class="mt-1 text-sm font-medium text-slate-900">@PreviousBalance(Model).ToString("C")</dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">New Balance</dt>
+            <dd class="mt-1 text-sm font-medium text-slate-900">@Model.BalanceAfter.ToString("C")</dd>
+        </div>
+        <div>
+            <dt class="text-sm text-slate-500">Date &amp; Time</dt>
+            <dd class="mt-1 text-sm font-medium text-slate-900">@Model.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</dd>
+        </div>
+    </dl>
+
+    @if (!string.IsNullOrEmpty(Model.RelatedAccountNumber))
+    {
+        <div class="mt-6 border-t border-slate-200 pt-6">
+            <h2 class="text-sm font-semibold text-slate-900">Counterparty Account</h2>
+            <p class="mt-2 text-sm text-slate-600">
+                @(isOutgoing ? "Receiver" : "Sender") account:
+                <a asp-controller="Admin" asp-action="AccountDetails" asp-route-accountNumber="@Model.RelatedAccountNumber"
+                   class="font-medium text-slate-900 hover:underline">@Model.RelatedAccountNumber</a>
+                @(nameMap.ContainsKey(Model.RelatedAccountNumber) ? $"({nameMap[Model.RelatedAccountNumber]})" : "")
+            </p>
+        </div>
+    }
+
+    <div class="mt-6 border-t border-slate-200 pt-6">
+        <h2 class="text-sm font-semibold text-slate-900">Reference / Description</h2>
+        <p class="mt-2 text-sm text-slate-600">@Model.Note</p>
+    </div>
+</div>

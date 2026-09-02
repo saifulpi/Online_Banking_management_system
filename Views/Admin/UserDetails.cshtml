@@ -1,0 +1,138 @@
+@model AppUser
+@{
+    ViewData["Title"] = "User Details";
+    var account = (Account?)ViewBag.Account;
+    var transactions = (List<Transaction>)ViewBag.Transactions;
+    var totalTransactions = (int)ViewBag.TotalTransactions;
+    var isSelf = (bool)ViewBag.IsSelf;
+    var isAdmin = string.Equals(Model.Role, "Admin", StringComparison.OrdinalIgnoreCase);
+
+    string StatusBadge(string name, bool state)
+    {
+        return $"inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {(state ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800")}";
+    }
+}
+
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">User Details</h1>
+        <p class="mt-1 text-sm text-slate-600">@Model.FullName</p>
+    </div>
+    <a asp-controller="Admin" asp-action="Users" class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+        ← Back to Users
+    </a>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <!-- Profile -->
+    <div class="rounded-lg bg-white p-6 shadow">
+        <h2 class="text-lg font-semibold text-slate-900">Profile</h2>
+        <dl class="mt-4 space-y-3 text-sm">
+            <div class="flex justify-between"><dt class="text-slate-500">Name</dt><dd class="font-medium text-slate-900">@Model.FullName</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Email</dt><dd class="font-medium text-slate-900">@Model.Email</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Phone</dt><dd class="font-medium text-slate-900">@Model.MobileNumber</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Address</dt><dd class="font-medium text-slate-900">@(string.IsNullOrEmpty(Model.Address) ? "—" : Model.Address)</dd></div>
+            <div class="flex justify-between">
+                <dt class="text-slate-500">Role</dt>
+                <dd><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(isAdmin ? "bg-purple-100 text-purple-800" : "bg-indigo-100 text-indigo-800")">@Model.Role</span></dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-slate-500">Status</dt>
+                <dd><span class="@(StatusBadge(Model.Status, Model.Status == "Active"))">@Model.Status</span></dd>
+            </div>
+            <div class="flex justify-between"><dt class="text-slate-500">Registered</dt><dd class="font-medium text-slate-900">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd></div>
+        </dl>
+        <p class="mt-4 text-xs text-slate-400">Passwords are never displayed or modifiable by administrators.</p>
+    </div>
+
+    <!-- Account -->
+    <div class="rounded-lg bg-white p-6 shadow">
+        <h2 class="text-lg font-semibold text-slate-900">Bank Account</h2>
+        @if (account != null)
+        {
+            <dl class="mt-4 space-y-3 text-sm">
+                <div class="flex justify-between"><dt class="text-slate-500">Account Number</dt><dd class="font-medium text-slate-900">@account.AccountNumber</dd></div>
+                <div class="flex justify-between"><dt class="text-slate-500">Account Type</dt><dd class="font-medium text-slate-900">@account.AccountType</dd></div>
+                <div class="flex justify-between"><dt class="text-slate-500">Balance</dt><dd class="font-bold text-slate-900">@account.Balance.ToString("C")</dd></div>
+                <div class="flex justify-between">
+                    <dt class="text-slate-500">Account Status</dt>
+                    <dd><span class="@(StatusBadge(account.Status, account.Status == "Active"))">@account.Status</span></dd>
+                </div>
+            </dl>
+            <a asp-controller="Admin" asp-action="AccountDetails" asp-route-accountNumber="@account.AccountNumber"
+               class="mt-4 inline-block rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">View Account</a>
+        }
+        else
+        {
+            <p class="mt-4 text-sm text-slate-500">No banking account is linked to this user.</p>
+        }
+    </div>
+
+    <!-- Actions -->
+    <div class="rounded-lg bg-white p-6 shadow">
+        <h2 class="text-lg font-semibold text-slate-900">Actions</h2>
+        <div class="mt-4 space-y-3">
+            <a asp-controller="Admin" asp-action="EditUser" asp-route-id="@Model.Id"
+               class="block rounded-md bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-indigo-700">Edit User</a>
+            <a asp-controller="Admin" asp-action="Transactions" asp-route-accountNumber="@Model.AccountNumber"
+               class="block rounded-md bg-slate-100 px-4 py-2 text-center text-sm font-medium text-slate-700 hover:bg-slate-200">View All Transactions</a>
+
+            @if (!isAdmin)
+            {
+                @if (Model.Status == "Active")
+                {
+                    <form asp-controller="Admin" asp-action="DeactivateUser" asp-route-id="@Model.Id" method="post"
+                          class="user-action-form" data-action="deactivate" data-user-name="@Model.FullName">
+                        <button type="submit" class="w-full rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Deactivate User</button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-controller="Admin" asp-action="ActivateUser" asp-route-id="@Model.Id" method="post"
+                          class="user-action-form" data-action="activate" data-user-name="@Model.FullName">
+                        <button type="submit" class="w-full rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">Activate User</button>
+                    </form>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Transactions -->
+<div class="mt-6 rounded-lg bg-white p-6 shadow">
+    <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Recent Transactions</h2>
+        <span class="text-sm text-slate-500">@totalTransactions total</span>
+    </div>
+    <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Type</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Note</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Date &amp; Time</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white">
+                @if (transactions.Count == 0)
+                {
+                    <tr><td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">No transactions found.</td></tr>
+                }
+                @foreach (var t in transactions)
+                {
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3"><partial name="_TransactionBadges" model="t" /></td>
+                        <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">@t.Amount.ToString("C")</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Note</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="px-4 py-3"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(t.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@t.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<partial name="_ConfirmUserActionModal" />

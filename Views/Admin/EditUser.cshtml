@@ -1,0 +1,85 @@
+@model AdminEditUserViewModel
+@{
+    ViewData["Title"] = "Edit User";
+    var unauthorized = (bool)(ViewBag.Unauthorized ?? false);
+}
+
+<div class="mx-auto max-w-2xl">
+    <div class="mb-8 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-slate-900">Edit User</h1>
+        <a asp-controller="Admin" asp-action="UserDetails" asp-route-id="@Model.Id"
+           class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">← Back</a>
+    </div>
+
+    @if (unauthorized)
+    {
+        <div class="rounded-md bg-red-50 p-4 border border-red-200">
+            <p class="text-sm text-red-700">You cannot edit your own administrator account.</p>
+        </div>
+    }
+    else
+    {
+        <form asp-action="EditUser" method="post" class="rounded-lg bg-white p-8 shadow">
+            <input type="hidden" asp-for="Id" />
+
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="mb-4 rounded-md bg-red-50 p-4 border border-red-200">
+                    <div asp-validation-summary="All" class="text-sm text-red-700"></div>
+                </div>
+            }
+
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label asp-for="AccountNumber" class="block text-sm font-medium text-slate-700">Account Number</label>
+                    <input asp-for="AccountNumber" readonly
+                           class="mt-1 block w-full rounded-md border-slate-300 bg-slate-100 px-3 py-2 text-slate-600 sm:text-sm" />
+                </div>
+                <div>
+                    <label asp-for="Role" class="block text-sm font-medium text-slate-700">Role</label>
+                    <input asp-for="Role" readonly
+                           class="mt-1 block w-full rounded-md border-slate-300 bg-slate-100 px-3 py-2 text-slate-600 sm:text-sm" />
+                </div>
+                <div>
+                    <label asp-for="FirstName" class="block text-sm font-medium text-slate-700">First Name</label>
+                    <input asp-for="FirstName" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 shadow-sm focus:border-slate-900 focus:ring-slate-900 sm:text-sm" />
+                    <span asp-validation-for="FirstName" class="text-sm text-red-600"></span>
+                </div>
+                <div>
+                    <label asp-for="LastName" class="block text-sm font-medium text-slate-700">Last Name</label>
+                    <input asp-for="LastName" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 shadow-sm focus:border-slate-900 focus:ring-slate-900 sm:text-sm" />
+                    <span asp-validation-for="LastName" class="text-sm text-red-600"></span>
+                </div>
+                <div>
+                    <label asp-for="Email" class="block text-sm font-medium text-slate-700">Email</label>
+                    <input asp-for="Email" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 shadow-sm focus:border-slate-900 focus:ring-slate-900 sm:text-sm" />
+                    <span asp-validation-for="Email" class="text-sm text-red-600"></span>
+                </div>
+                <div>
+                    <label asp-for="MobileNumber" class="block text-sm font-medium text-slate-700">Mobile Number</label>
+                    <input asp-for="MobileNumber" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 shadow-sm focus:border-slate-900 focus:ring-slate-900 sm:text-sm" />
+                    <span asp-validation-for="MobileNumber" class="text-sm text-red-600"></span>
+                </div>
+                <div class="sm:col-span-2">
+                    <label asp-for="Address" class="block text-sm font-medium text-slate-700">Address</label>
+                    <input asp-for="Address" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 shadow-sm focus:border-slate-900 focus:ring-slate-900 sm:text-sm" />
+                    <span asp-validation-for="Address" class="text-sm text-red-600"></span>
+                </div>
+            </div>
+
+            <p class="mt-4 text-xs text-slate-400">Password cannot be changed by an administrator.</p>
+
+            <div class="mt-6 flex items-center justify-end space-x-3">
+                <a asp-controller="Admin" asp-action="UserDetails" asp-route-id="@Model.Id"
+                   class="text-sm font-medium text-slate-600 hover:text-slate-900">Cancel</a>
+                <button type="submit" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

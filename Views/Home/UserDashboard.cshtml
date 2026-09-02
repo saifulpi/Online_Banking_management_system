@@ -1,0 +1,129 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_DashboardLayout";
+}
+
+<div class="space-y-8">
+    <!-- Welcome -->
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">Welcome back, @Model.CurrentUser?.FirstName</h1>
+        <p class="mt-1 text-sm text-slate-600">
+            Here's what's happening with your account <span class="font-semibold text-slate-800">@Model.MyAccount?.AccountNumber</span> today.
+        </p>
+    </div>
+
+    <!-- Statistics / Summary -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-lg bg-white p-5 shadow">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-slate-500">Total Deposit</p>
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100">💵</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-emerald-600">@Model.TotalDeposit.ToString("C")</p>
+            <p class="mt-1 text-xs text-slate-400">Money deposited into this account</p>
+        </div>
+
+        <div class="rounded-lg bg-white p-5 shadow">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-slate-500">Total Withdraw</p>
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100">🏧</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-red-600">@Model.TotalWithdraw.ToString("C")</p>
+            <p class="mt-1 text-xs text-slate-400">Money withdrawn or transferred out</p>
+        </div>
+
+        <div class="rounded-lg bg-white p-5 shadow">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-slate-500">Current Balance</p>
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100">💳</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-indigo-600">@(Model.MyAccount?.Balance.ToString("C") ?? "-")</p>
+            <p class="mt-1 text-xs text-slate-400">Available balance</p>
+        </div>
+
+        <div class="rounded-lg bg-white p-5 shadow">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-slate-500">Recent Activity</p>
+                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100">📈</span>
+            </div>
+            <p class="mt-2 text-2xl font-bold text-slate-900">@Model.TotalTransactions</p>
+            <p class="mt-1 text-xs text-slate-400">
+                @if (Model.LastActivityDate.HasValue)
+                {
+                    <text>Last activity @Model.LastActivityDate.Value.ToLocalTime().ToString("d MMM, h:mm tt")</text>
+                }
+                else
+                {
+                    <text>No activity yet</text>
+                }
+            </p>
+        </div>
+    </div>
+
+    <!-- Latest Transactions -->
+    <div class="rounded-lg bg-white p-6 shadow">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-slate-900">Latest Transactions</h2>
+            <a asp-controller="Account" asp-action="History"
+               class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+                View All Transactions
+            </a>
+        </div>
+
+        @if (Model.RecentTransactions.Any())
+        {
+            <div class="mt-5 divide-y divide-slate-200">
+                @foreach (var t in Model.RecentTransactions.Take(2))
+                {
+                    var isDeposit = t.Type == TransactionType.Deposit;
+                    var isWithdrawal = t.Type == TransactionType.Withdrawal;
+                    var isTransfer = t.Type == TransactionType.Transfer;
+                    var received = isTransfer && t.Note.StartsWith("Received", StringComparison.OrdinalIgnoreCase);
+                    var direction = isDeposit || received ? "in" : "out";
+                    var badgeColor = isDeposit ? "bg-emerald-100 text-emerald-700"
+                        : isWithdrawal ? "bg-red-100 text-red-700"
+                        : received ? "bg-teal-100 text-teal-700"
+                        : "bg-indigo-100 text-indigo-700";
+                    var label = isDeposit ? "Deposit"
+                        : isWithdrawal ? "Withdrawal"
+                        : received ? "Transfer In"
+                        : "Transfer Out";
+
+                    <div class="flex items-center justify-between py-4">
+                        <div class="flex items-center">
+                            <div class="mr-4 flex h-11 w-11 items-center justify-center rounded-full text-lg @(direction == "in" ? "bg-emerald-100" : "bg-red-100")">
+                                @(direction == "in" ? "⬇" : "⬆")
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">
+                                    <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold @badgeColor">@label</span>
+                                </p>
+                                <p class="mt-1 text-xs text-slate-500">@t.Date.ToLocalTime().ToString("d MMM yyyy, h:mm tt")</p>
+                                <p class="mt-0.5 text-xs text-slate-500">@t.Note</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold @(direction == "in" ? "text-emerald-600" : "text-red-600")">
+                                @(direction == "in" ? "+" : "-")@t.Amount.ToString("C")
+                            </p>
+                            <p class="mt-0.5 text-xs">
+                                <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium
+                                    @(t.Status == "Completed" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700")">
+                                    @t.Status
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="mt-5 rounded-lg border border-dashed border-slate-300 p-10 text-center">
+                <p class="text-slate-500">No transactions yet.</p>
+                <p class="mt-1 text-sm text-slate-400">Use <a asp-controller="Account" asp-action="Deposit" class="text-emerald-700 hover:underline">Deposit</a> to add money to your account.</p>
+            </div>
+        }
+    </div>
+</div>

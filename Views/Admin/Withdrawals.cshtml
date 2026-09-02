@@ -1,0 +1,17 @@
+@model List<Transaction>
+@{
+    ViewData["Title"] = "Withdrawal Management";
+    ViewBag.SectionTitle = "Withdrawal Management";
+    ViewBag.ShowBalances = true;
+}
+
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-900">Withdrawal Management</h1>
+    <p class="mt-1 text-sm text-slate-600">All withdrawal transactions across the system.</p>
+</div>
+
+<div class="rounded-lg bg-white p-6 shadow">
+    <partial name="_TransactionFilters" />
+    <partial name="_TransactionTable" model="Model" />
+    <partial name="_Pagination" />
+</div>

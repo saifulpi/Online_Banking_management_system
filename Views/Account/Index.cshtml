@@ -1,0 +1,51 @@
+@model List<Account>
+@{
+    ViewData["Title"] = "Accounts";
+}
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-slate-900">All Accounts</h1>
+        <a asp-controller="Account" asp-action="Create"
+           class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">+ Open New Account</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="overflow-hidden rounded-lg bg-white shadow">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Account No</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Phone</th>
+                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Balance</th>
+                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    @foreach (var account in Model)
+                    {
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-4 py-3 text-sm font-medium text-slate-900">@account.AccountNumber</td>
+                            <td class="px-4 py-3 text-sm text-slate-700">@account.Name</td>
+                            <td class="px-4 py-3 text-sm text-slate-700">@account.PhoneNumber</td>
+                            <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">@account.Balance.ToString("C")</td>
+                            <td class="px-4 py-3 text-right text-sm">
+                                <a asp-controller="Account" asp-action="Details" asp-route-accountNumber="@account.AccountNumber"
+                                   class="text-emerald-700 hover:underline">View</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="rounded-lg bg-white p-10 text-center shadow">
+            <p class="text-slate-600">No accounts have been created yet.</p>
+            <a asp-controller="Account" asp-action="Create" class="mt-4 inline-block text-emerald-700 hover:underline">Create an account</a>
+        </div>
+    }
+</div>

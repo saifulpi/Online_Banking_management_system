@@ -1,0 +1,97 @@
+<div id="userActionModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-slate-900/50" onclick="closeUserActionModal()"></div>
+    <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <div class="flex items-start space-x-4">
+            <div id="userActionIcon" class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100">
+                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                </svg>
+            </div>
+            <div>
+                <h2 id="userActionTitle" class="text-lg font-semibold text-slate-900">Confirm Action</h2>
+                <p id="userActionMessage" class="mt-1 text-sm text-slate-600"></p>
+                <p id="userActionDetail" class="mt-2 text-sm font-medium text-red-700"></p>
+            </div>
+        </div>
+        <div class="mt-6 flex items-center justify-end space-x-3">
+            <button type="button" onclick="closeUserActionModal()"
+                    class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+                Cancel
+            </button>
+            <button type="button" id="confirmUserActionBtn"
+                    class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
+                Yes, Deactivate
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pendingUserActionForm = null;
+
+    function openUserActionModal(type, name) {
+        const title = document.getElementById('userActionTitle');
+        const message = document.getElementById('userActionMessage');
+        const detail = document.getElementById('userActionDetail');
+        const icon = document.getElementById('userActionIcon');
+        const confirmBtn = document.getElementById('confirmUserActionBtn');
+
+        if (type === 'activate') {
+            title.textContent = 'Activate ' + name + '?';
+            message.textContent = 'They will be able to log in again.';
+            detail.textContent = 'This restores access for this user.';
+            icon.className = 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100';
+            icon.querySelector('svg').className = 'h-6 w-6 text-emerald-600';
+            confirmBtn.textContent = 'Yes, Activate';
+            confirmBtn.className = 'rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700';
+        } else if (type === 'freeze') {
+            title.textContent = 'Freeze account ' + name + '?';
+            message.textContent = 'All transactions will be blocked until reactivated.';
+            detail.textContent = 'The balance and account history remain unchanged.';
+            icon.className = 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100';
+            icon.querySelector('svg').className = 'h-6 w-6 text-red-600';
+            confirmBtn.textContent = 'Yes, Freeze';
+            confirmBtn.className = 'rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700';
+        } else if (type === 'activate-account') {
+            title.textContent = 'Activate account ' + name + '?';
+            message.textContent = 'Transactions will be allowed again.';
+            detail.textContent = 'This restores full functionality for this account.';
+            icon.className = 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100';
+            icon.querySelector('svg').className = 'h-6 w-6 text-emerald-600';
+            confirmBtn.textContent = 'Yes, Activate';
+            confirmBtn.className = 'rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700';
+        } else {
+            title.textContent = 'Deactivate ' + name + '?';
+            message.textContent = 'They will no longer be able to log in.';
+            detail.textContent = 'Their account and balance remain unchanged.';
+            icon.className = 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100';
+            icon.querySelector('svg').className = 'h-6 w-6 text-red-600';
+            confirmBtn.textContent = 'Yes, Deactivate';
+            confirmBtn.className = 'rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700';
+        }
+
+        document.getElementById('userActionModal').classList.remove('hidden');
+    }
+
+    document.querySelectorAll('.user-action-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            pendingUserActionForm = form;
+            openUserActionModal(form.dataset.action, form.dataset.userName);
+        });
+    });
+
+    document.getElementById('confirmUserActionBtn').addEventListener('click', function () {
+        if (pendingUserActionForm) {
+            const form = pendingUserActionForm;
+            pendingUserActionForm = null;
+            form.submit();
+        }
+        closeUserActionModal();
+    });
+
+    function closeUserActionModal() {
+        pendingUserActionForm = null;
+        document.getElementById('userActionModal').classList.add('hidden');
+    }
+</script>

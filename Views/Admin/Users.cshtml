@@ -1,0 +1,115 @@
+@model List<AppUser>
+@{
+    ViewData["Title"] = "User Management";
+    var accountStatusMap = (Dictionary<string, Account>)ViewBag.AccountStatusMap ?? new();
+
+    string StatusBadge(bool active)
+    {
+        return active
+            ? "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800"
+            : "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800";
+    }
+}
+
+<div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">User Management</h1>
+        <p class="mt-1 text-sm text-slate-600">Manage all registered bank users.</p>
+    </div>
+</div>
+
+<div class="rounded-lg bg-white p-6 shadow">
+    <form method="get" class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div>
+            <label class="block text-xs font-medium text-slate-600">Search</label>
+            <input type="text" name="search" value="@ViewBag.Search" placeholder="Name, email, phone or account number"
+                   class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm" />
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600">Status</label>
+            <select name="status" class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm">
+                <option value="">All Statuses</option>
+                <option value="Active" selected="@(ViewBag.Status == "Active")">Active</option>
+                <option value="Inactive" selected="@(ViewBag.Status == "Inactive")">Inactive</option>
+            </select>
+        </div>
+        <div class="flex items-end">
+            <button type="submit" class="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                Filter
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">User ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Email</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Phone</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Account Number</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Account Status</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Registered</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white">
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="px-4 py-8 text-center text-sm text-slate-500">No users found.</td>
+                    </tr>
+                }
+                @foreach (var user in Model)
+                {
+                    var account = accountStatusMap.ContainsKey(user.AccountNumber) ? accountStatusMap[user.AccountNumber] : null;
+                    var isAdmin = string.Equals(user.Role, "Admin", StringComparison.OrdinalIgnoreCase);
+                    var accountActive = account == null || string.Equals(account.Status, "Active", StringComparison.OrdinalIgnoreCase);
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3 text-sm text-slate-600">@user.Id.Substring(user.Id.Length - 8)</td>
+                        <td class="px-4 py-3 text-sm font-medium text-slate-900">@user.FullName</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@user.Email</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@user.MobileNumber</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@user.AccountNumber</td>
+                        <td class="px-4 py-3"><span class="@(StatusBadge(accountActive))">@(account?.Status ?? "Active")</span></td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@user.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center space-x-2">
+                                <a asp-controller="Admin" asp-action="UserDetails" asp-route-id="@user.Id"
+                                   class="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200">View</a>
+                                @if (!isAdmin)
+                                {
+                                    <a asp-controller="Admin" asp-action="EditUser" asp-route-id="@user.Id"
+                                       class="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-100">Edit</a>
+                                    @if (string.Equals(user.Status, "Active", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <form asp-controller="Admin" asp-action="DeactivateUser" asp-route-id="@user.Id" method="post"
+                                              class="user-action-form inline" data-action="deactivate" data-user-name="@user.FullName">
+                                            <button type="submit" class="rounded-md bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Deactivate</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-controller="Admin" asp-action="ActivateUser" asp-route-id="@user.Id" method="post"
+                                              class="user-action-form inline" data-action="activate" data-user-name="@user.FullName">
+                                            <button type="submit" class="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100">Activate</button>
+                                        </form>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="rounded-md bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700">Admin</span>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_Pagination" />
+</div>
+
+<partial name="_ConfirmUserActionModal" />

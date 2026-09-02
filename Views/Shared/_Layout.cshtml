@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-100">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Online Bank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="h-full">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-emerald-700 shadow">
+            <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
+                <div class="flex h-16 items-center justify-between">
+                    <div class="flex items-center">
+                        <a asp-controller="Home" asp-action="Index" class="flex items-center">
+                            <span class="text-2xl mr-2">🏦</span>
+                            <span class="text-xl font-bold text-white">Online Bank</span>
+                        </a>
+                    </div>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="hidden md:flex md:items-center md:space-x-4">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Admin" asp-action="Index"
+                                   class="rounded-md px-3 py-2 text-sm font-medium text-emerald-50 hover:bg-emerald-600">Dashboard</a>
+                                <a asp-controller="Admin" asp-action="Users"
+                                   class="rounded-md px-3 py-2 text-sm font-medium text-emerald-50 hover:bg-emerald-600">Users</a>
+                                <a asp-controller="Admin" asp-action="Accounts"
+                                   class="rounded-md px-3 py-2 text-sm font-medium text-emerald-50 hover:bg-emerald-600">Accounts</a>
+                                <a asp-controller="Account" asp-action="Create"
+                                   class="rounded-md px-3 py-2 text-sm font-medium text-emerald-50 hover:bg-emerald-600">Open Account</a>
+                                <a asp-controller="Admin" asp-action="Transactions"
+                                   class="rounded-md bg-white px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">Transactions</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Home" asp-action="Index"
+                                   class="rounded-md px-3 py-2 text-sm font-medium text-emerald-50 hover:bg-emerald-600">Dashboard</a>
+                                <span class="rounded-md px-3 py-2 text-sm font-medium text-emerald-100">Hello, @User.Identity.Name</span>
+                                <a asp-controller="Account" asp-action="History"
+                                   class="rounded-md bg-white px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">My History</a>
+                            }
+
+                            <form asp-controller="Auth" asp-action="Logout" method="post" class="logout-form inline">
+                                <button type="submit"
+                                        class="rounded-md px-3 py-2 text-sm font-medium text-emerald-50 hover:bg-emerald-600">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="hidden md:flex md:items-center md:space-x-4">
+                            <a asp-controller="Auth" asp-action="Login"
+                               class="rounded-md bg-white px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">Login</a>
+                            <a asp-controller="Auth" asp-action="Signup"
+                               class="rounded-md px-4 py-2 text-sm font-medium text-emerald-50 hover:bg-emerald-600">Sign Up</a>
+                        </div>
+                    }
+                </div>
+            </nav>
+            <!-- Mobile menu -->
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="md:hidden bg-emerald-800 px-4 pb-3 space-y-1">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin" asp-action="Index" class="block rounded-md px-3 py-2 text-base font-medium text-emerald-50 hover:bg-emerald-700">Dashboard</a>
+                        <a asp-controller="Admin" asp-action="Users" class="block rounded-md px-3 py-2 text-base font-medium text-emerald-50 hover:bg-emerald-700">Users</a>
+                        <a asp-controller="Admin" asp-action="Accounts" class="block rounded-md px-3 py-2 text-base font-medium text-emerald-50 hover:bg-emerald-700">Accounts</a>
+                        <a asp-controller="Account" asp-action="Create" class="block rounded-md px-3 py-2 text-base font-medium text-emerald-50 hover:bg-emerald-700">Open Account</a>
+                        <a asp-controller="Admin" asp-action="Transactions" class="block rounded-md px-3 py-2 text-base font-medium text-emerald-50 hover:bg-emerald-700">Transactions</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Home" asp-action="Index" class="block rounded-md px-3 py-2 text-base font-medium text-emerald-50 hover:bg-emerald-700">Dashboard</a>
+                        <a asp-controller="Account" asp-action="History" class="block rounded-md px-3 py-2 text-base font-medium text-emerald-50 hover:bg-emerald-700">My History</a>
+                    }
+                    <form asp-controller="Auth" asp-action="Logout" method="post" class="logout-form inline">
+                        <button type="submit" class="block rounded-md px-3 py-2 text-base font-medium text-emerald-50 hover:bg-emerald-700">Logout</button>
+                    </form>
+                </div>
+            }
+        </header>
+
+        <!-- Flash messages -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
+                <div class="rounded-md bg-emerald-50 p-4 border border-emerald-200">
+                    <div class="flex">
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-emerald-800">@TempData["Success"]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <main class="flex-1 py-8">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                @RenderBody()
+            </div>
+        </main>
+
+        <footer class="border-t border-slate-200 bg-white">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <p class="text-center text-sm text-slate-500">
+                    &copy; 2026 - Online Banking Management System
+                </p>
+            </div>
+        </footer>
+    </div>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <partial name="_LogoutModal" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

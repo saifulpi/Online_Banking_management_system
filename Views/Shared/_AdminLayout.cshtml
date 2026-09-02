@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Online Bank Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="h-full bg-slate-100">
+    @{
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+        var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+        bool IsActive(string ctrl, string? act = null)
+        {
+            if (!string.Equals(controller, ctrl, StringComparison.OrdinalIgnoreCase))
+                return false;
+            if (act == null)
+                return true;
+            return string.Equals(action, act, StringComparison.OrdinalIgnoreCase);
+        }
+
+        var adminName = User.Identity?.Name ?? "Admin";
+        var adminEmail = User.FindFirstValue("Email") ?? string.Empty;
+        var adminPictureUrl = User.FindFirstValue("ProfilePictureUrl");
+        var adminInitials = string.Concat(adminName.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2).Select(p => p[0])).ToUpperInvariant();
+    }
+
+    <div class="min-h-full lg:flex">
+        <!-- Mobile top bar -->
+        <div class="lg:hidden bg-slate-900 py-3 flex items-center justify-between shadow">
+            <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4">
+                <a asp-controller="Admin" asp-action="Index" class="flex items-center">
+                    <span class="text-2xl mr-2">🏦</span>
+                    <span class="text-xl font-bold text-white">Admin Panel</span>
+                </a>
+                <button type="button" onclick="document.getElementById('mobileSidebar').classList.toggle('hidden')"
+                        class="rounded-md bg-slate-700 p-2 text-slate-100 hover:bg-slate-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside id="mobileSidebar" class="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-slate-900 text-slate-100 shadow-xl z-20">
+            <div class="flex h-full flex-col overflow-y-auto">
+                <div class="px-6 py-6 flex items-center border-b border-slate-800">
+                    <a asp-controller="Admin" asp-action="Index" class="flex items-center">
+                        <span class="text-2xl mr-2">🏦</span>
+                        <span class="text-xl font-bold text-white">Admin Panel</span>
+                    </a>
+                </div>
+
+                <!-- Admin profile -->
+                <div class="px-6 py-5 border-b border-slate-800">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-slate-700">
+                            @if (!string.IsNullOrEmpty(adminPictureUrl))
+                            {
+                                <img src="@adminPictureUrl" alt="Profile picture" class="h-full w-full object-cover" />
+                            }
+                            else
+                            {
+                                <span class="text-sm font-bold text-white">@adminInitials</span>
+                            }
+                        </div>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-semibold text-white">@adminName</p>
+                            <p class="truncate text-xs text-slate-400">@adminEmail</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="flex-1 space-y-1 px-4 py-4">
+                    <span class="px-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Management</span>
+
+                    <a asp-controller="Admin" asp-action="Index"
+                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Admin", "Index") ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white")">
+                        <span class="mr-3 text-lg">📊</span> Dashboard
+                    </a>
+                    <a asp-controller="Admin" asp-action="Users"
+                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Admin", "Users") || IsActive("Admin", "UserDetails") || IsActive("Admin", "EditUser") ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white")">
+                        <span class="mr-3 text-lg">👥</span> User Management
+                    </a>
+                    <a asp-controller="Admin" asp-action="Accounts"
+                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Admin", "Accounts") || IsActive("Admin", "AccountDetails") ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white")">
+                        <span class="mr-3 text-lg">🏦</span> Account Management
+                    </a>
+
+                    <span class="px-2 pt-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Transactions</span>
+
+                    <a asp-controller="Admin" asp-action="Deposits"
+                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Admin", "Deposits") ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white")">
+                        <span class="mr-3 text-lg">💰</span> Deposits
+                    </a>
+                    <a asp-controller="Admin" asp-action="Withdrawals"
+                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Admin", "Withdrawals") ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white")">
+                        <span class="mr-3 text-lg">🏧</span> Withdrawals
+                    </a>
+                    <a asp-controller="Admin" asp-action="Transfers"
+                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Admin", "Transfers") ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white")">
+                        <span class="mr-3 text-lg">🔁</span> Fund Transfers
+                    </a>
+                    <a asp-controller="Admin" asp-action="Transactions"
+                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Admin", "Transactions") || IsActive("Admin", "TransactionDetails") ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white")">
+                        <span class="mr-3 text-lg">📜</span> Transaction Management
+                    </a>
+                </nav>
+
+                <!-- Logout -->
+                <div class="border-t border-slate-800 px-4 py-4">
+                    <form asp-controller="Auth" asp-action="Logout" method="post" class="logout-form">
+                        <button type="submit"
+                                class="flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium text-red-300 hover:bg-red-900 hover:text-white">
+                            <span class="mr-3 text-lg">↪️</span> Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <div class="lg:pl-64 flex flex-col min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex-1">
+            <!-- Flash messages -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
+                    <div class="rounded-md bg-emerald-50 p-4 border border-emerald-200">
+                        <p class="text-sm font-medium text-emerald-800">@TempData["Success"]</p>
+                    </div>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
+                    <div class="rounded-md bg-red-50 p-4 border border-red-200">
+                        <p class="text-sm font-medium text-red-800">@TempData["Error"]</p>
+                    </div>
+                </div>
+            }
+
+            <main class="flex-1 py-8">
+                <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    @RenderBody()
+                </div>
+            </main>
+
+            <footer class="border-t border-slate-200 bg-white">
+                <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+                    <p class="text-center text-sm text-slate-500">&copy; 2026 - Online Banking Management System | Admin</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <partial name="_LogoutModal" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

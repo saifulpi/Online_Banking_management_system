@@ -1,0 +1,46 @@
+@model Account
+@{
+    ViewData["Title"] = "Account Details";
+    var isAdmin = User.IsInRole("Admin");
+    if (!isAdmin) { Layout = "_DashboardLayout"; }
+}
+
+<div class="mx-auto max-w-3xl space-y-6">
+    <div class="rounded-lg bg-white p-8 shadow">
+        <div class="flex items-start justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">@Model.Name</h1>
+                <p class="mt-1 text-sm text-slate-600">Account No: <span class="font-semibold">@Model.AccountNumber</span></p>
+                <p class="mt-1 text-sm text-slate-600">Phone: @Model.PhoneNumber</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-slate-500">Current Balance</p>
+                <p class="text-3xl font-bold text-emerald-600">@Model.Balance.ToString("C")</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-lg bg-white p-6 shadow">
+        <h2 class="text-lg font-semibold text-slate-900">Account Actions</h2>
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <a asp-controller="Account" asp-action="Deposit"
+               class="rounded-md bg-blue-600 px-4 py-3 text-center text-sm font-medium text-white hover:bg-blue-700">Deposit</a>
+            <a asp-controller="Account" asp-action="Withdraw"
+               class="rounded-md bg-amber-500 px-4 py-3 text-center text-sm font-medium text-white hover:bg-amber-600">Withdraw</a>
+            <a asp-controller="Account" asp-action="Transfer"
+               class="rounded-md bg-indigo-600 px-4 py-3 text-center text-sm font-medium text-white hover:bg-indigo-700">Transfer</a>
+        </div>
+    </div>
+
+    <div class="rounded-lg bg-white p-6 shadow">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-slate-900">Transaction History</h2>
+            <a asp-controller="Account" asp-action="History" asp-route-accountNumber="@Model.AccountNumber"
+               class="text-sm text-emerald-700 hover:underline">View all</a>
+        </div>
+        <div class="mt-4 space-y-3">
+            @* Transaction history loaded via separate view *@
+            <p class="text-sm text-slate-500">Select "Transaction History" to see full records for this account.</p>
+        </div>
+    </div>
+</div>

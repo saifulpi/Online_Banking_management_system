@@ -1,0 +1,16 @@
+@model List<Transaction>
+@{
+    ViewData["Title"] = "Deposit Management";
+    ViewBag.SectionTitle = "Deposit Management";
+}
+
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-900">Deposit Management</h1>
+    <p class="mt-1 text-sm text-slate-600">All deposit transactions across the system.</p>
+</div>
+
+<div class="rounded-lg bg-white p-6 shadow">
+    <partial name="_TransactionFilters" />
+    <partial name="_TransactionTable" model="Model" />
+    <partial name="_Pagination" />
+</div>

@@ -1,0 +1,49 @@
+@model List<AppUser>
+@{
+    ViewData["Title"] = "Registered Users";
+}
+
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-slate-900">Registered Users</h1>
+
+    @if (Model.Any())
+    {
+        <div class="overflow-hidden rounded-lg bg-white shadow">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Account No</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Mobile</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Role</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Registered</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    @foreach (var user in Model)
+                    {
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-4 py-3 text-sm font-medium text-slate-900">@user.FullName</td>
+                            <td class="px-4 py-3 text-sm text-slate-700">@user.AccountNumber</td>
+                            <td class="px-4 py-3 text-sm text-slate-700">@user.MobileNumber</td>
+                            <td class="px-4 py-3 text-sm text-slate-700">@user.Email</td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex rounded-full px-2 py-1 text-xs font-semibold @(user.Role == "Admin" ? "bg-purple-100 text-purple-700" : "bg-indigo-100 text-indigo-700")">
+                                    @user.Role
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-600">@user.CreatedAt.ToLocalTime().ToString("g")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="rounded-lg bg-white p-10 text-center shadow">
+            <p class="text-slate-600">No users registered yet.</p>
+        </div>
+    }
+</div>
