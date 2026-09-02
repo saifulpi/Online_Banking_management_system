@@ -203,7 +203,17 @@ git commit -m "Initial commit"
 3. Railway automatically detects the `Dockerfile` and builds the image.
 4. Add the **`MongoDbSettings__ConnectionString`** (and any other optional vars) in **Variables** for the service.
 
-### 4. Verify
+### 4. Persist profile pictures (Railway Volume)
+
+Profile pictures are written to disk, so they must be stored on a **persistent volume** to survive redeploys/restarts (Railway containers are otherwise ephemeral).
+
+1. In the Railway dashboard, open your service → **Settings** → **Volumes** → **Add Volume**.
+2. Set the **Mount Path** to `/data`.
+3. Deploy/redeploy the service.
+
+The app automatically detects the mount (via Railway's `RAILWAY_VOLUME_MOUNT_PATH` variable) and stores uploads under `<mount>/profile-pictures`. If you prefer a custom path, set the `PROFILE_PICTURE_PATH` variable explicitly instead.
+
+### 5. Verify
 
 Railway assigns a public URL (e.g. `https://your-app.up.railway.app`). The admin account is seeded automatically on first startup; you can then log in, change the default admin password, and start using the app.
 
@@ -211,7 +221,7 @@ Railway assigns a public URL (e.g. `https://your-app.up.railway.app`). The admin
 
 - **Ports:** The `railway.json`/`Dockerfile` bind the app to `0.0.0.0:$PORT` (Railway sets `PORT` automatically). No manual port configuration is needed.
 - **HTTPS:** `UseForwardedHeaders` is configured so that HTTPS redirection and HSTS work correctly behind Railway's TLS-terminating proxy without redirect loops.
-- **Profile pictures:** Uploaded profile pictures are stored on the container's local filesystem. Because Railway containers are ephemeral, these files are **not persisted** across redeploys. For durable storage you would integrate an object-storage service (e.g. AWS S3); this is outside the current scope.
+- **Profile pictures:** Stored on a persistent Railway Volume (`/data/profile-pictures` by default) once a volume is attached, so they survive redeploys. Without a volume attached they fall back to the container's ephemeral filesystem and will be lost on restart.
 
 ---
 

@@ -193,6 +193,21 @@ public class ProfileController : Controller
             System.IO.File.Delete(physicalPath);
     }
 
-    private static string ProfilePicturesRoot() =>
-        Path.Combine(AppContext.BaseDirectory, "uploads", "profile-pictures");
+    private static string ProfilePicturesRoot()
+    {
+        // Allow deploying to a persistent disk (e.g. a Railway Volume mounted at /data),
+        // which survives container restarts/redeploys. Priorities:
+        //   1. An explicit PROFILE_PICTURE_PATH environment variable.
+        //   2. Railway's auto-set RAILWAY_VOLUME_MOUNT_PATH (the mounted volume).
+        //   3. The container's own filesystem (local development).
+        var configured = System.Environment.GetEnvironmentVariable("PROFILE_PICTURE_PATH");
+        if (!string.IsNullOrWhiteSpace(configured))
+            return Path.GetFullPath(configured);
+
+        var volumeMount = System.Environment.GetEnvironmentVariable("RAILWAY_VOLUME_MOUNT_PATH");
+        if (!string.IsNullOrWhiteSpace(volumeMount))
+            return Path.Combine(Path.GetFullPath(volumeMount), "profile-pictures");
+
+        return Path.Combine(AppContext.BaseDirectory, "uploads", "profile-pictures");
+    }
 }
