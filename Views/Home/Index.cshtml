@@ -128,7 +128,7 @@
                                     else if (t.Type == TransactionType.Withdrawal) { <span class="text-red-600">Withdrawal</span> }
                                     else { <span class="text-indigo-600">Transfer</span> }
                                 </p>
-                                <p class="text-xs text-slate-500">@t.Date.ToLocalTime().ToString("g")</p>
+                                <p class="text-xs text-slate-500">@t.Date.ToLocalTime().ToDisplayDateTime()</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-sm font-semibold text-slate-900">@t.Amount.ToString("C")</p>

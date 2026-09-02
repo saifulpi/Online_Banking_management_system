@@ -45,7 +45,7 @@
                         <td class="px-4 py-3 text-sm font-medium text-slate-900">@t.RelatedAccountNumber</td>
                         <td class="px-4 py-3 text-sm text-slate-600">@(!string.IsNullOrEmpty(t.RelatedAccountNumber) && nameMap.ContainsKey(t.RelatedAccountNumber) ? nameMap[t.RelatedAccountNumber] : "—")</td>
                         <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">@t.Amount.ToString("C")</td>
-                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToDisplayDateTimeSeconds()</td>
                         <td class="px-4 py-3"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(t.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@t.Status</span></td>
                         <td class="px-4 py-3 text-sm text-slate-600">@t.Note</td>
                         <td class="px-4 py-3">

@@ -33,7 +33,7 @@
                                     @user.Role
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-sm text-slate-600">@user.CreatedAt.ToLocalTime().ToString("g")</td>
+                            <td class="px-4 py-3 text-sm text-slate-600">@user.CreatedAt.ToLocalTime().ToDisplayDateTime()</td>
                         </tr>
                     }
                 </tbody>

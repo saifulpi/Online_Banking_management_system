@@ -51,7 +51,7 @@
             <p class="mt-1 text-xs text-slate-400">
                 @if (Model.LastActivityDate.HasValue)
                 {
-                    <text>Last activity @Model.LastActivityDate.Value.ToLocalTime().ToString("d MMM, h:mm tt")</text>
+                    <text>Last activity @Model.LastActivityDate.Value.ToLocalTime().ToDisplayDateTime()</text>
                 }
                 else
                 {
@@ -99,7 +99,7 @@
                                 <p class="text-sm font-semibold text-slate-900">
                                     <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold @badgeColor">@label</span>
                                 </p>
-                                <p class="mt-1 text-xs text-slate-500">@t.Date.ToLocalTime().ToString("d MMM yyyy, h:mm tt")</p>
+                                <p class="mt-1 text-xs text-slate-500">@t.Date.ToLocalTime().ToDisplayDateTime()</p>
                                 <p class="mt-0.5 text-xs text-slate-500">@t.Note</p>
                             </div>
                         </div>

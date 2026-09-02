@@ -178,3 +178,13 @@ C:\Users\saifu\AppData\Local\Temp\obs_build_vol\OnlineBankingSystem.runtimeconfi
 C:\Users\saifu\AppData\Local\Temp\obs_build_vol\OnlineBankingSystem.dll
 C:\Users\saifu\AppData\Local\Temp\obs_build_vol\OnlineBankingSystem.pdb
 D:\Projects\Online_Banking_System\bin\Debug\net10.0\railway.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\appsettings.Development.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\appsettings.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\railway.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.staticwebassets.runtime.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.staticwebassets.endpoints.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.exe
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.deps.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.runtimeconfig.json
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.dll
+C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.pdb

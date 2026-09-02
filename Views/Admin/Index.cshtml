@@ -115,7 +115,7 @@
                         </td>
                         <td class="px-4 py-3"><partial name="_TransactionBadges" model="t" /></td>
                         <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">@t.Amount.ToString("C")</td>
-                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToDisplayDateTimeSeconds()</td>
                         <td class="px-4 py-3"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(t.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@t.Status</span></td>
                     </tr>
                 }

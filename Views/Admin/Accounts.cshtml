@@ -73,7 +73,7 @@
                         <td class="px-4 py-3 text-sm text-slate-600">@account.AccountType</td>
                         <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">@account.Balance.ToString("C")</td>
                         <td class="px-4 py-3"><span class="@(StatusBadge(account.Status))">@account.Status</span></td>
-                        <td class="px-4 py-3 text-sm text-slate-600">@account.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@account.CreatedAt.ToLocalTime().ToDisplayDate()</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center space-x-2">
                                 <a asp-controller="Admin" asp-action="AccountDetails" asp-route-accountNumber="@account.AccountNumber"

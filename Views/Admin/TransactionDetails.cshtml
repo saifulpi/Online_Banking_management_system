@@ -68,7 +68,7 @@
         </div>
         <div>
             <dt class="text-sm text-slate-500">Date &amp; Time</dt>
-            <dd class="mt-1 text-sm font-medium text-slate-900">@Model.Date.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</dd>
+            <dd class="mt-1 text-sm font-medium text-slate-900">@Model.Date.ToLocalTime().ToDisplayDateTimeSeconds()</dd>
         </div>
     </dl>
 
