@@ -11,6 +11,7 @@ The system provides a complete customer-facing banking experience along with a d
 ### Customer Portal
 - **User Registration & Login** — Sign up with an 8-digit account number, mobile number, email, and password; log in with mobile number and password.
 - **Secure Authentication** — Custom claims-based cookie authentication, ASP.NET password hashing, role-based access control, and anti-forgery protection on every form.
+- **Re-authentication for Money Movements** — Regular users must re-enter their password to authorize a deposit, withdrawal, or transfer, providing an extra layer of security on sensitive transactions.
 - **User Dashboard** — Personalized overview showing current balance, total deposits, total withdrawals, recent activity, and latest transactions.
 - **Profile Management** — Update personal details such as name, mobile number, and address.
 - **Profile Picture Upload** — Set or remove an optional avatar (JPG, JPEG, PNG, or WEBP, up to 2 MB), shown in the sidebar and displayed immediately after saving.
@@ -30,6 +31,7 @@ The system provides a complete customer-facing banking experience along with a d
 ### Platform
 - **Validation & Error Handling** — Server-side model validation plus friendly user-facing error messages.
 - **Business Rules** — Configurable transaction limits (per-transaction withdrawal, per-transaction transfer, daily withdrawal amount, daily withdrawal count, and daily transfer count).
+- **Localized Currency** — All monetary amounts are displayed in Bangladeshi Taka (৳) with a `bn-BD` culture configured app-wide as the default.
 - **Responsive UI** — Modern interface built with Tailwind CSS that adapts across desktop and mobile.
 
 ---
@@ -183,6 +185,7 @@ OnlineBankingSystem/
 - Passwords are stored as hashes using `PasswordHasher<AppUser>`; they are never stored in plain text.
 - All restricted controllers and actions enforce authorization via `[Authorize]` and role-based policies (`Admin`).
 - Users can only view or transact on their **own** accounts; cross-account access is denied.
+- Deposits, withdrawals, and transfers require regular (non-admin) users to re-enter their password for authorization before the transaction is executed.
 - All state-changing forms use anti-forgery tokens to protect against CSRF.
 - Profile-picture uploads are validated (extension and size), stored with unique filenames, and served only to the owning user (path-traversal and cross-account access are blocked).
 - Business limits (per-transaction and daily) are enforced server-side, not just in the UI.
