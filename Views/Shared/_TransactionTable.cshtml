@@ -65,7 +65,7 @@
                         <td class="@(ColumnClass(true))">@PreviousBalance(t).ToString("C")</td>
                         <td class="@(ColumnClass(true))">@t.BalanceAfter.ToString("C")</td>
                     }
-                    <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToDisplayDateTimeSeconds()</td>
+                    <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToDisplayDateTimeSeconds()</td>
                     <td class="px-4 py-3"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(t.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@t.Status</span></td>
                     <td class="px-4 py-3 text-sm text-slate-600">@t.Note</td>
                     <td class="px-4 py-3">

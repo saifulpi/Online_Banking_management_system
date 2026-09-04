@@ -36,7 +36,7 @@
                 <dt class="text-slate-500">Status</dt>
                 <dd><span class="@(StatusBadge(Model.Status))">@Model.Status</span></dd>
             </div>
-            <div class="flex justify-between"><dt class="text-slate-500">Created</dt><dd class="font-medium text-slate-900">@Model.CreatedAt.ToLocalTime().ToDisplayDateTime()</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Created</dt><dd class="font-medium text-slate-900">@Model.CreatedAt.ToDisplayDateTime()</dd></div>
         </dl>
     </div>
 
@@ -117,7 +117,7 @@
                         <td class="px-4 py-3 text-right text-sm font-semibold text-slate-900">@t.Amount.ToString("C")</td>
                         <td class="px-4 py-3 text-right text-sm text-slate-600">@t.BalanceAfter.ToString("C")</td>
                         <td class="px-4 py-3 text-sm text-slate-600">@t.Note</td>
-                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToLocalTime().ToDisplayDateTime()</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">@t.Date.ToDisplayDateTime()</td>
                         <td class="px-4 py-3"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium @(t.Status == "Completed" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")">@t.Status</span></td>
                     </tr>
                 }
