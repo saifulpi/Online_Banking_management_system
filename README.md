@@ -153,9 +153,12 @@ Money transfers update both the sender's and receiver's balances together. Where
    The forgot-password flow sends the reset OTP by email over Gmail SMTP. Provide the sender credentials as environment variables (SMTP settings are read from configuration at startup and credentials are **not** committed to source):
 
    ```bash
-   EmailSettings__FromEmail=youraddress@gmail.com
-   EmailSettings__Username=youraddress@gmail.com
-   EmailSettings__AppPassword=your-gmail-app-password
+   EmailSettings__Host=smtp.resend.com
+   EmailSettings__Port=587
+   EmailSettings__Username=resend
+   EmailSettings__AppPassword=your-resend-api-key
+   EmailSettings__FromEmail=onboarding@resend.dev
+   EmailSettings__FromName=Online Bank
    ```
 
    > Use a [Gmail app password](https://support.google.com/accounts/answer/185833) rather than your normal account password for a more secure setup.
@@ -201,9 +204,12 @@ The app reads its connection settings from configuration at startup. For product
 | `MongoDbSettings__ConnectionString`       | Your MongoDB Atlas connection string |
 | `MongoDbSettings__DatabaseName`           | Database name (default `onlinebank`) |
 | `BankingSettings__MinimumTransactionAmount` | Optional: override the minimum deposit/withdraw/transfer amount |
-| `EmailSettings__FromEmail`                | Gmail address used to send password-reset OTP emails |
-| `EmailSettings__Username`                 | Gmail account used for SMTP authentication |
-| `EmailSettings__AppPassword`              | Gmail app password for the sender account |
+| `EmailSettings__Host`                 | SMTP host (Resend: `smtp.resend.com`) |
+| `EmailSettings__Port`                 | SMTP port (Resend: `587`) |
+| `EmailSettings__Username`             | SMTP username (Resend: `resend`) |
+| `EmailSettings__AppPassword`          | SMTP password / API key (use a Resend API key) |
+| `EmailSettings__FromEmail`            | Sender address (use `onboarding@resend.dev` for testing; verify a domain for others) |
+| `EmailSettings__FromName`             | Sender display name (e.g. `Online Bank`) |
 
 > Use a dedicated production database/credentials rather than committed credentials.
 
