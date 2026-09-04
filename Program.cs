@@ -36,6 +36,14 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// Log email configuration on startup so Railway deploy logs show what the app sees.
+// Password value is hidden — only shows whether it's set or not.
+var log = app.Services.GetRequiredService<ILogger<Program>>();
+var es = app.Configuration.GetSection("EmailSettings");
+log.LogInformation("EmailSettings loaded: Host={Host} Port={Port} Username=[{Username}] FromEmail=[{FromEmail}] AppPasswordSet={PwSet}",
+    es["Host"], es["Port"], es["Username"], es["FromEmail"],
+    !string.IsNullOrWhiteSpace(es["AppPassword"]) ? "YES" : "NO");
+
 // Correctly resolve the original scheme/host when running behind a TLS-terminating
 // reverse proxy (e.g. Railway). This keeps HSTS/HTTPS redirection working without
 // redirect loops. Railway's proxy addresses are dynamic, so we trust forwarded headers.

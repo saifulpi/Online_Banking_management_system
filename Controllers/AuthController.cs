@@ -140,7 +140,7 @@ public class AuthController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send OTP email to {Email}", verifiedUser.Email);
+            _logger.LogError(ex, "Failed to send OTP email to {Email} — {Message}", verifiedUser.Email, ex.Message);
         }
 
         TempData["ForgotMessage"] = "If an account exists with this email, a verification code has been sent.";
