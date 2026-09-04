@@ -29,7 +29,6 @@ D:\Projects\Online_Banking_System\obj\Debug\net10.0\scopedcss\Views\Shared\_Layo
 D:\Projects\Online_Banking_System\obj\Debug\net10.0\scopedcss\bundle\OnlineBankingSystem.styles.css
 D:\Projects\Online_Banking_System\obj\Debug\net10.0\scopedcss\projectbundle\OnlineBankingSystem.bundle.scp.css
 D:\Projects\Online_Banking_System\obj\Debug\net10.0\compressed\sg8lfv03ej-{0}-61n19gt1b8-61n19gt1b8.gz
-D:\Projects\Online_Banking_System\obj\Debug\net10.0\compressed\9mm8pzaog9-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 D:\Projects\Online_Banking_System\obj\Debug\net10.0\compressed\mjsiv7dt5e-{0}-bqjiyaj88i-bqjiyaj88i.gz
 D:\Projects\Online_Banking_System\obj\Debug\net10.0\compressed\5eytyt0xia-{0}-c2jlpeoesf-c2jlpeoesf.gz
 D:\Projects\Online_Banking_System\obj\Debug\net10.0\compressed\gpw35e1vmj-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -187,4 +186,5 @@ C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.deps.json
 C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.runtimeconfig.json
 C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.dll
 C:\Users\saifu\AppData\Local\Temp\obs_build_dates\OnlineBankingSystem.pdb
-D:\Projects\Online_Banking_System\obj\Debug\net10.0\compressed\2njybexgqd-{0}-j94qqf5v6h-j94qqf5v6h.gz
+D:\Projects\Online_Banking_System\obj\Debug\net10.0\compressed\9mm8pzaog9-{0}-hypm9hengz-hypm9hengz.gz
+D:\Projects\Online_Banking_System\obj\Debug\net10.0\compressed\2njybexgqd-{0}-h5wirh6q83-h5wirh6q83.gz

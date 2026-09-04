@@ -107,3 +107,20 @@ body {
 input[type="checkbox"] {
   accent-color: #1e8277;
 }
+
+/* Disable browser-native password reveal button (Chrome / Edge / Safari) */
+input[type="password"]::-webkit-textfield-decoration-container {
+  pointer-events: none !important;
+}
+input[type="password"]::-webkit-textfield-decoration-container::before {
+  display: none !important;
+}
+input[type="text"]::-webkit-textfield-decoration-container {
+  pointer-events: none !important;
+}
+input[type="text"]::-webkit-textfield-decoration-container::before {
+  display: none !important;
+}
+input::-ms-reveal {
+  display: none !important;
+}

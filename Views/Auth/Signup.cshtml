@@ -66,8 +66,11 @@
                         </div>
                         <div>
                             <label asp-for="Password" class="block text-sm font-semibold text-slate-700">Set Password</label>
-                            <input asp-for="Password" autocomplete="new-password" id="Password"
-                                   class="login-input mt-2 w-full rounded-xl border-bank-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bank-400 focus:bg-white focus:ring-bank-400/30" />
+                            <div class="mt-2 relative">
+                                <input asp-for="Password" autocomplete="new-password" id="Password"
+                                       class="login-input w-full rounded-xl border-bank-200 bg-slate-50/50 px-4 py-3 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bank-400 focus:bg-white focus:ring-bank-400/30" />
+                                <partial name="_PasswordEyeButton" view-data='@new ViewDataDictionary(ViewData) { { "TargetId", "Password" } }' />
+                            </div>
                             <span asp-validation-for="Password" class="mt-1 block text-sm text-red-600"></span>
                             <div id="passwordChecklist" class="mt-3 space-y-1.5">
                                 <div class="pw-req flex items-center gap-2 text-xs text-slate-400 transition-colors duration-150" data-rule="length">

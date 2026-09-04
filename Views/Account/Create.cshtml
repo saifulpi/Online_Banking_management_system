@@ -61,14 +61,20 @@
             </div>
             <div>
                 <label asp-for="Password" class="block text-sm font-medium text-slate-700">Set Password</label>
-                <input asp-for="Password" autocomplete="new-password"
-                       class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" />
+                <div class="mt-1 relative">
+                    <input asp-for="Password" autocomplete="new-password"
+                           class="block w-full rounded-md border-slate-300 px-3 py-2 pr-10 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" />
+                    <partial name="_PasswordEyeButton" view-data='@new ViewDataDictionary(ViewData) { { "TargetId", "Password" } }' />
+                </div>
                 <span asp-validation-for="Password" class="text-sm text-red-600"></span>
             </div>
             <div>
                 <label asp-for="ConfirmPassword" class="block text-sm font-medium text-slate-700">Confirm Password</label>
-                <input asp-for="ConfirmPassword" autocomplete="new-password"
-                       class="mt-1 block w-full rounded-md border-slate-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" />
+                <div class="mt-1 relative">
+                    <input asp-for="ConfirmPassword" autocomplete="new-password"
+                           class="block w-full rounded-md border-slate-300 px-3 py-2 pr-10 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" />
+                    <partial name="_PasswordEyeButton" view-data='@new ViewDataDictionary(ViewData) { { "TargetId", "ConfirmPassword" } }' />
+                </div>
                 <span asp-validation-for="ConfirmPassword" class="text-sm text-red-600"></span>
             </div>
             <div class="flex items-center justify-end space-x-3">

@@ -56,7 +56,8 @@
                                     </svg>
                                 </div>
                                 <input asp-for="Password" autocomplete="current-password"
-                                       class="login-input w-full rounded-xl border-bank-200 bg-slate-50/50 py-3 pl-12 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bank-400 focus:bg-white focus:ring-bank-400/30" />
+                                       class="login-input w-full rounded-xl border-bank-200 bg-slate-50/50 py-3 pl-12 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-bank-400 focus:bg-white focus:ring-bank-400/30" />
+                                <partial name="_PasswordEyeButton" view-data='@new ViewDataDictionary(ViewData) { { "TargetId", "Password" } }' />
                             </div>
                             <span asp-validation-for="Password" class="mt-1 block text-sm text-red-600"></span>
                         </div>
