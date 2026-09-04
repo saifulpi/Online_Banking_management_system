@@ -9,12 +9,14 @@ public interface IUserService
     Task<AppUser?> RegisterAsync(SignupViewModel model);
     Task<(bool Success, AppUser? User, string Message)> ValidateLoginAsync(string mobileNumber, string password);
     Task<AppUser?> GetUserByMobileAsync(string mobileNumber);
+    Task<AppUser?> GetUserByEmailAsync(string email);
     Task<AppUser?> GetUserByIdAsync(string id);
     Task<AppUser?> GetUserByAccountNumberAsync(string accountNumber);
     Task<List<AppUser>> GetAllUsersAsync();
     Task<(List<AppUser> Items, long Total)> GetUsersPagedAsync(string? search, string? status, int page, int pageSize);
     Task<long> GetTotalUsersAsync();
     Task<AppUser?> UpdateProfileAsync(string userId, ProfileViewModel model, string? profilePictureUrl = null);
+    Task<AppUser?> UpdatePasswordAsync(string userId, string newPassword);
     Task<AppUser?> UpdateUserByAdminAsync(string userId, AdminEditUserViewModel model);
     Task<AppUser?> SetUserStatusAsync(string userId, string status);
     Task EnsureAdminSeededAsync();
@@ -96,6 +98,12 @@ public class UserService : IUserService
     public async Task<AppUser?> GetUserByMobileAsync(string mobileNumber)
     {
         var filter = Builders<AppUser>.Filter.Eq(u => u.MobileNumber, mobileNumber.Trim());
+        return await _context.Users.Find(filter).FirstOrDefaultAsync();
+    }
+
+    public async Task<AppUser?> GetUserByEmailAsync(string email)
+    {
+        var filter = Builders<AppUser>.Filter.Eq(u => u.Email, email.Trim().ToLowerInvariant());
         return await _context.Users.Find(filter).FirstOrDefaultAsync();
     }
 
@@ -263,6 +271,21 @@ public class UserService : IUserService
                 .Set(a => a.PhoneNumber, user.MobileNumber);
             await _context.Accounts.UpdateOneAsync(accountFilter, accountUpdate);
         }
+
+        return user;
+    }
+
+    public async Task<AppUser?> UpdatePasswordAsync(string userId, string newPassword)
+    {
+        var user = await GetUserByIdAsync(userId);
+        if (user == null)
+            return null;
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, newPassword);
+
+        var filter = Builders<AppUser>.Filter.Eq(u => u.Id, user.Id);
+        var update = Builders<AppUser>.Update.Set(u => u.PasswordHash, user.PasswordHash);
+        await _context.Users.UpdateOneAsync(filter, update);
 
         return user;
     }

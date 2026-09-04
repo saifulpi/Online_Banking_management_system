@@ -29,3 +29,81 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* ============================================================
+   Online Bank - Global Background
+   ============================================================ */
+
+.app-background {
+  background-color: #F4F7F9;
+  background-image:
+    radial-gradient(1200px 500px at 85% -10%, rgba(47, 162, 148, 0.06), transparent 60%),
+    radial-gradient(900px 600px at -10% 20%, rgba(37, 99, 235, 0.05), transparent 55%),
+    radial-gradient(800px 700px at 50% 120%, rgba(7, 134, 95, 0.05), transparent 60%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* ============================================================
+   Online Bank - Login Page Styles
+   ============================================================ */
+
+.login-page {
+  background: linear-gradient(135deg, #f0f9ff 0%, #effcf9 25%, #f8fafc 55%, #f0f9ff 100%);
+}
+
+@media (min-width: 1024px) {
+  body:has(.login-page) {
+    background: #f8fafc;
+  }
+}
+
+.login-input {
+  min-height: 50px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.login-input:focus {
+  border-color: #2fa294;
+  box-shadow: 0 0 0 3px rgba(47, 162, 148, 0.15);
+  outline: none;
+}
+
+/* Bar chart bars with varying heights */
+.bar-child:nth-child(1) { height: 35%; }
+.bar-child:nth-child(2) { height: 55%; }
+.bar-child:nth-child(3) { height: 40%; }
+.bar-child:nth-child(4) { height: 70%; }
+.bar-child:nth-child(5) { height: 88%; }
+.bar-child:nth-child(6) { height: 62%; }
+.bar-child:nth-child(7) { height: 78%; }
+
+/* Small donut chart */
+.donut {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #1e8277 0% 64%,
+    #e2e8f0 64% 100%
+  );
+  display: inline-block;
+  position: relative;
+}
+
+.donut::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* Checkbox accent color override for browsers that support it */
+input[type="checkbox"] {
+  accent-color: #1e8277;
+}

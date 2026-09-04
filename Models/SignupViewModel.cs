@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using OnlineBankingSystem.Validation;
 
 namespace OnlineBankingSystem.Models;
 
@@ -13,7 +14,7 @@ public class SignupViewModel
     public string MobileNumber { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Email address is required.")]
-    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    [TrimmedEmail(ErrorMessage = "Enter a valid email address.")]
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "First name is required.")]
@@ -27,6 +28,7 @@ public class SignupViewModel
     [Required(ErrorMessage = "Password is required.")]
     [DataType(DataType.Password)]
     [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
+    [StrongPassword]
     public string Password { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Please confirm your password.")]

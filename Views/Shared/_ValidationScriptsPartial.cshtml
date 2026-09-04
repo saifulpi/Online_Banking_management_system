@@ -1,2 +1,14 @@
 ﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    // Register the custom "strongpassword" client rule emitted by StrongPasswordAttribute.
+    // The server-side attribute validates: >= 6 chars, one uppercase, one lowercase,
+    // one digit and one special character.
+    if (typeof $.validator !== "undefined" && typeof $.fn.valid !== "undefined") {
+        $.validator.addMethod("strongpassword", function (value, element, params) {
+            return this.optional(element) || /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/.test(value);
+        }, "Password must include at least 6 characters, one uppercase letter (A-Z), one lowercase letter (a-z), one number (0-9) and one special character (e.g. @@, #, $, %, !).");
+
+        $.validator.unobtrusive.adapters.addBool("strongpassword");
+    }
+</script>

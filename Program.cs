@@ -18,6 +18,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<OtpService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

@@ -20,6 +20,9 @@ The system provides a complete customer-facing banking experience along with a d
 - **Money Transfer** — Transfer funds between accounts, with optional reference notes and transactional integrity.
 - **Transaction History** — View a chronological, filtered history of deposits, withdrawals, and transfers.
 - **Account Details** — View account-level information and running balance.
+- **Forgot Password** — Request a password reset by entering your registered email **and** mobile number; a one-time password (OTP) is emailed via Gmail SMTP, and the new password is set after OTP verification (with rules enforced live on the reset page).
+- **Interactive Dashboard Cards** — Summary cards (Current Balance, Total Deposit, Total Withdraw, Recent Activity) have a subtle smooth hover zoom + elevation effect that returns to normal on mouse-out without affecting layout.
+- **Contact Us** — A public, professional contact page with clickable email (`mailto:`) and phone (`tel:`) links, support hours, and social-media placeholders; linked from the login page and the user dashboard.
 
 ### Admin Panel
 - **Admin Dashboard** — Aggregate statistics: total users, accounts, deposits, withdrawals, transferred funds, and system-wide balance.
@@ -69,6 +72,7 @@ The system provides a complete customer-facing banking experience along with a d
 | Database     | MongoDB (MongoDB.Driver 3.11.1) via MongoDB Atlas |
 | Frontend     | Tailwind CSS (CDN), Bootstrap, jQuery + jQuery Validation |
 | Authentication | Custom claims-based cookie authentication with role authorization |
+| Email / OTP    | Gmail SMTP (System.Net.Mail) + in-memory 6-digit OTP service for password reset |
 | Security     | Password hashing, anti-forgery tokens, input validation |
 
 ---
@@ -78,14 +82,16 @@ The system provides a complete customer-facing banking experience along with a d
 The application follows the standard ASP.NET Core MVC request pipeline:
 
 - **Controllers** orchestrate requests and enforce authorization:
-  - `AuthController` — registration, login, logout, access-denied handling.
-  - `HomeController` — routes users/admins to their respective dashboards.
+  - `AuthController` — registration, login, logout, access-denied handling, and the forgot-password / password-reset (OTP) flow.
+  - `HomeController` — routes users/admins to their respective dashboards, and serves the public, anonymous `Contact` page.
   - `AccountController` — deposits, withdrawals, transfers, history, and account details.
   - `ProfileController` — profile editing and profile-picture upload/retrieval.
   - `AdminController` — admin dashboard, user management, account management, and transaction oversight.
 - **Services** encapsulate business logic and data access:
-  - `IUserService` — user registration, authentication, and profile management.
+  - `IUserService` — user registration, authentication, profile management, email-based lookup, and password updates.
   - `IAccountService` — account lifecycle, deposits, withdrawals, transfers (with transactional guarantees), and reporting.
+  - `IEmailService` — sends emails (e.g. password-reset OTP) through Gmail SMTP; credentials come from environment variables, never source code.
+  - `OtpService` — generates and verifies time-limited, single-use 6-digit OTPs (5-minute expiry, attempt-lockout) via in-memory cache.
 - **Models** — domain entities (`AppUser`, `Account`, `Transaction`) plus dedicated view models for each screen.
 - **Views** — Razor views organized by controller under `Views/`, sharing layouts, partials, and validation scripts.
 
@@ -142,14 +148,25 @@ Money transfers update both the sender's and receiver's balances together. Where
    Bankingsettings__MinimumTransactionAmount=100
    ```
 
-   Banking limits are configurable under `BankingSettings`:
+3. **Configure email for the password-reset OTP**
+
+   The forgot-password flow sends the reset OTP by email over Gmail SMTP. Provide the sender credentials as environment variables (SMTP settings are read from configuration at startup and credentials are **not** committed to source):
+
+   ```bash
+   EmailSettings__FromEmail=youraddress@gmail.com
+   EmailSettings__Password=your-gmail-app-password
+   ```
+
+   > Use a [Gmail app password](https://support.google.com/accounts/answer/185833) rather than your normal account password for a more secure setup.
+
+4. **Banking limits** — configurable under `BankingSettings`:
    - `WithdrawLimit` — maximum single-withdrawal amount.
    - `TransferLimit` — maximum single-transfer amount.
    - `DailyWithdrawLimit` — maximum total withdrawals per account per day.
    - `DailyWithdrawCountLimit` — maximum number of withdrawals per account per day.
    - `DailyTransferCountLimit` — maximum number of transfers per account per day.
 
-3. **Run the application**
+5. **Run the application**
 
    ```bash
    dotnet run
@@ -183,6 +200,8 @@ The app reads its connection settings from configuration at startup. For product
 | `MongoDbSettings__ConnectionString`       | Your MongoDB Atlas connection string |
 | `MongoDbSettings__DatabaseName`           | Database name (default `onlinebank`) |
 | `BankingSettings__MinimumTransactionAmount` | Optional: override the minimum deposit/withdraw/transfer amount |
+| `EmailSettings__FromEmail`                | Gmail address used to send password-reset OTP emails |
+| `EmailSettings__Password`                 | Gmail app password for the sender account |
 
 > Use a dedicated production database/credentials rather than committed credentials.
 
@@ -230,7 +249,7 @@ Railway assigns a public URL (e.g. `https://your-app.up.railway.app`). The admin
 ```
 OnlineBankingSystem/
 ├── Controllers/          # MVC controllers (Auth, Home, Account, Profile, Admin)
-├── Data/                 # MongoDbContext, IUserService/UserService, IAccountService/AccountService
+├── Data/                 # MongoDbContext, IUserService/UserService, IAccountService/AccountService, EmailService/EmailSettings, OtpService
 ├── Models/               # Domain entities and view models
 ├── Validation/           # Custom validation attributes (e.g. profile picture upload)
 ├── Views/                # Razor views (per-controller folders + shared layouts/partials)
@@ -255,6 +274,8 @@ OnlineBankingSystem/
 - All state-changing forms use anti-forgery tokens to protect against CSRF.
 - Profile-picture uploads are validated (extension and size), stored with unique filenames, and served only to the owning user (path-traversal and cross-account access are blocked).
 - Business limits (per-transaction and daily) are enforced server-side, not just in the UI.
+- The forgot-password flow requires both the registered **email and mobile number** to match the same account before an OTP is sent, and it returns a generic message regardless of whether the account exists to avoid user enumeration. OTPs are single-use, expire after 5 minutes, and lock out after repeated failed attempts driven by server-side business logic.
+- The `Contact` page is explicitly `[AllowAnonymous]`, so it is reachable from the login page and the user dashboard without exposing any other internal routes.
 
 ---
 

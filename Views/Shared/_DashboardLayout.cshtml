@@ -5,9 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Online Bank</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bank: {
+                            50: '#effcf9',
+                            100: '#d7f5ee',
+                            200: '#b2e9df',
+                            300: '#7fd7c9',
+                            400: '#4abdad',
+                            500: '#2fa294',
+                            600: '#07865f',
+                            700: '#056b53',
+                            800: '#0a3d33',
+                            900: '#08332b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="h-full bg-slate-100">
+<body class="h-full bg-[#F4F7F9]">
     @{
         var controller = ViewContext.RouteData.Values["controller"]?.ToString();
         var action = ViewContext.RouteData.Values["action"]?.ToString();
@@ -23,16 +45,20 @@
             .Take(2).Select(p => p[0])).ToUpperInvariant();
     }
 
-    <div class="min-h-full lg:flex">
+    <div class="min-h-screen lg:flex">
         <!-- Mobile top bar -->
-        <div class="lg:hidden bg-emerald-700 py-3 shadow">
+        <div class="lg:hidden bg-bank-800 py-3 shadow">
             <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4">
-                <a asp-controller="Home" asp-action="Index" class="flex items-center">
-                    <span class="text-2xl mr-2">🏦</span>
-                    <span class="text-xl font-bold text-white">Online Bank</span>
+                <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-bank-500 to-bank-700">
+                        <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9v9M15 9v9" />
+                        </svg>
+                    </span>
+                    <span class="text-lg font-bold text-white">Online Bank</span>
                 </a>
                 <button type="button" onclick="document.getElementById('mobileSidebar').classList.toggle('hidden')"
-                        class="rounded-md bg-emerald-600 p-2 text-emerald-50 hover:bg-emerald-500">
+                        class="rounded-md bg-bank-700/70 p-2 text-bank-100 hover:bg-bank-700">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -41,19 +67,23 @@
         </div>
 
         <!-- Sidebar -->
-        <aside id="mobileSidebar" class="hidden lg:flex lg:w-72 lg:flex-col lg:fixed lg:inset-y-0 bg-emerald-800 text-emerald-50 shadow-xl z-20">
+        <aside id="mobileSidebar" class="hidden lg:flex lg:w-[268px] lg:flex-col lg:fixed lg:inset-y-0 bg-gradient-to-b from-bank-800 to-[#052b26] text-bank-50 shadow-xl z-20">
             <div class="flex h-full flex-col overflow-y-auto">
-                <div class="px-6 py-6 flex items-center border-b border-emerald-700">
-                    <a asp-controller="Home" asp-action="Index" class="flex items-center">
-                        <span class="text-2xl mr-2">🏦</span>
-                        <span class="text-xl font-bold text-white">Online Bank</span>
+                <div class="px-6 py-6 flex items-center border-b border-white/10">
+                    <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2.5">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-bank-400 to-bank-600 shadow-md">
+                            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9v9M15 9v9" />
+                            </svg>
+                        </span>
+                        <span class="text-lg font-bold text-white">Online <span class="text-bank-300">Bank</span></span>
                     </a>
                 </div>
 
                 <!-- Profile -->
-                <div class="px-6 py-5 border-b border-emerald-700">
+                <div class="px-6 py-5 border-b border-white/10">
                     <div class="flex items-center space-x-3">
-                        <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-emerald-500">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-bank-400 to-bank-600 ring-2 ring-white/20">
                             @if (!string.IsNullOrEmpty(userPictureUrl))
                             {
                                 <img src="@userPictureUrl" alt="Profile picture" class="h-full w-full object-cover" />
@@ -65,51 +95,98 @@
                         </div>
                         <div class="min-w-0">
                             <p class="truncate text-sm font-semibold text-white">@userFullName</p>
-                            <p class="truncate text-xs text-emerald-300">@userEmail</p>
+                            <p class="truncate text-xs text-bank-300">@userEmail</p>
                         </div>
                     </div>
                     <a asp-controller="Profile" asp-action="Index"
-                       class="mt-3 inline-flex w-full items-center justify-center rounded-md bg-emerald-700 px-3 py-1.5 text-xs font-medium text-emerald-50 hover:bg-emerald-600">
+                       class="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-bank-50 ring-1 ring-white/10 transition-colors hover:bg-white/15">
                         Edit Profile
                     </a>
                 </div>
 
                 <!-- Navigation -->
                 <nav class="flex-1 space-y-1 px-4 py-4">
-                    <span class="px-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">Menu</span>
+                    <span class="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-bank-400/80">Menu</span>
 
                     <a asp-controller="Home" asp-action="Index"
-                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Home", "Index") ? "bg-emerald-700 text-white" : "text-emerald-100 hover:bg-emerald-700 hover:text-white")">
-                        <span class="mr-3 text-lg">📊</span> Dashboard
+                       class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 @(IsActive("Home", "Index") ? "bg-bank-600 text-white shadow-sm" : "text-bank-100 hover:bg-white/10 hover:text-white")">
+                        <span class="mr-3 flex h-6 w-6 items-center justify-center">
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 3v18h18" />
+                                <path d="M7 13l4-4 3 3 5-6" />
+                            </svg>
+                        </span> Dashboard
                     </a>
                     <a asp-controller="Profile" asp-action="Index"
-                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Profile", "Index") ? "bg-emerald-700 text-white" : "text-emerald-100 hover:bg-emerald-700 hover:text-white")">
-                        <span class="mr-3 text-lg">👤</span> Profile
+                       class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 @(IsActive("Profile", "Index") ? "bg-bank-600 text-white shadow-sm" : "text-bank-100 hover:bg-white/10 hover:text-white")">
+                        <span class="mr-3 flex h-6 w-6 items-center justify-center">
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </span> Profile
                     </a>
                     <a asp-controller="Account" asp-action="Deposit"
-                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Account", "Deposit") ? "bg-emerald-700 text-white" : "text-emerald-100 hover:bg-emerald-700 hover:text-white")">
-                        <span class="mr-3 text-lg">💰</span> Deposit
+                       class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 @(IsActive("Account", "Deposit") ? "bg-bank-600 text-white shadow-sm" : "text-bank-100 hover:bg-white/10 hover:text-white")">
+                        <span class="mr-3 flex h-6 w-6 items-center justify-center">
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                                <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+                            </svg>
+                        </span> Deposit
                     </a>
                     <a asp-controller="Account" asp-action="Withdraw"
-                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Account", "Withdraw") ? "bg-emerald-700 text-white" : "text-emerald-100 hover:bg-emerald-700 hover:text-white")">
-                        <span class="mr-3 text-lg">🏧</span> Withdraw
+                       class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 @(IsActive("Account", "Withdraw") ? "bg-bank-600 text-white shadow-sm" : "text-bank-100 hover:bg-white/10 hover:text-white")">
+                        <span class="mr-3 flex h-6 w-6 items-center justify-center">
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 5v14" />
+                                <path d="m19 12-7 7-7-7" />
+                            </svg>
+                        </span> Withdraw
                     </a>
                     <a asp-controller="Account" asp-action="Transfer"
-                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Account", "Transfer") ? "bg-emerald-700 text-white" : "text-emerald-100 hover:bg-emerald-700 hover:text-white")">
-                        <span class="mr-3 text-lg">🔁</span> Money Transfer
+                       class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 @(IsActive("Account", "Transfer") ? "bg-bank-600 text-white shadow-sm" : "text-bank-100 hover:bg-white/10 hover:text-white")">
+                        <span class="mr-3 flex h-6 w-6 items-center justify-center">
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M17 1l4 4-4 4" />
+                                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                                <path d="M7 23l-4-4 4-4" />
+                                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                            </svg>
+                        </span> Money Transfer
                     </a>
                     <a asp-controller="Account" asp-action="History"
-                       class="flex items-center rounded-md px-3 py-2.5 text-sm font-medium @(IsActive("Account", "History") ? "bg-emerald-700 text-white" : "text-emerald-100 hover:bg-emerald-700 hover:text-white")">
-                        <span class="mr-3 text-lg">📜</span> Transaction History
+                       class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 @(IsActive("Account", "History") ? "bg-bank-600 text-white shadow-sm" : "text-bank-100 hover:bg-white/10 hover:text-white")">
+                        <span class="mr-3 flex h-6 w-6 items-center justify-center">
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="18" rx="2" />
+                                <path d="M16 2v4M8 2v4M3 10h18" />
+                            </svg>
+                        </span> Transaction History
+                    </a>
+                    <a asp-controller="Home" asp-action="Contact"
+                       class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 @(IsActive("Home", "Contact") ? "bg-bank-600 text-white shadow-sm" : "text-bank-100 hover:bg-white/10 hover:text-white")">
+                        <span class="mr-3 flex h-6 w-6 items-center justify-center">
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                            </svg>
+                        </span> Contact Us
                     </a>
                 </nav>
 
                 <!-- Logout -->
-                <div class="border-t border-emerald-700 px-4 py-4">
+                <div class="border-t border-white/10 px-4 py-4">
                     <form asp-controller="Auth" asp-action="Logout" method="post" class="logout-form">
                         <button type="submit"
-                                class="flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium text-red-200 hover:bg-red-900 hover:text-white">
-                            <span class="mr-3 text-lg">↪️</span> Logout
+                                class="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-red-200 transition-colors duration-150 hover:bg-red-500/20 hover:text-white">
+                            <span class="mr-3 flex h-6 w-6 items-center justify-center">
+                                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                    <path d="m16 17 5-5-5-5" />
+                                    <path d="M21 12H9" />
+                                </svg>
+                            </span> Logout
                         </button>
                     </form>
                 </div>
@@ -117,26 +194,26 @@
         </aside>
 
         <!-- Main content -->
-        <div class="lg:pl-72 flex flex-col min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex-1">
+        <div class="lg:pl-[268px] flex flex-col min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex-1">
             <!-- Flash messages -->
             @if (TempData["Success"] != null)
             {
-                <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
-                    <div class="rounded-md bg-emerald-50 p-4 border border-emerald-200">
+                <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 mt-6">
+                    <div class="rounded-lg bg-emerald-50 p-4 border border-emerald-200">
                         <p class="text-sm font-medium text-emerald-800">@TempData["Success"]</p>
                     </div>
                 </div>
             }
 
             <main class="flex-1 py-8">
-                <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
                     @RenderBody()
                 </div>
             </main>
 
             <footer class="border-t border-slate-200 bg-white">
-                <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-                    <p class="text-center text-sm text-slate-500">&copy; 2026 - Online Banking Management System</p>
+                <div class="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
+                    <p class="text-center text-sm text-slate-400">&copy; 2026 - Online Banking Management System</p>
                 </div>
             </footer>
         </div>
