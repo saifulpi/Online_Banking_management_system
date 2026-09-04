@@ -154,7 +154,8 @@ Money transfers update both the sender's and receiver's balances together. Where
 
    ```bash
    EmailSettings__FromEmail=youraddress@gmail.com
-   EmailSettings__Password=your-gmail-app-password
+   EmailSettings__Username=youraddress@gmail.com
+   EmailSettings__AppPassword=your-gmail-app-password
    ```
 
    > Use a [Gmail app password](https://support.google.com/accounts/answer/185833) rather than your normal account password for a more secure setup.
@@ -201,7 +202,8 @@ The app reads its connection settings from configuration at startup. For product
 | `MongoDbSettings__DatabaseName`           | Database name (default `onlinebank`) |
 | `BankingSettings__MinimumTransactionAmount` | Optional: override the minimum deposit/withdraw/transfer amount |
 | `EmailSettings__FromEmail`                | Gmail address used to send password-reset OTP emails |
-| `EmailSettings__Password`                 | Gmail app password for the sender account |
+| `EmailSettings__Username`                 | Gmail account used for SMTP authentication |
+| `EmailSettings__AppPassword`              | Gmail app password for the sender account |
 
 > Use a dedicated production database/credentials rather than committed credentials.
 
